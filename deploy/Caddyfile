@@ -1,0 +1,24 @@
+# =============================================================================
+# PRODUCTION ONLY — INERT until Phase 2. Not used in local dev.
+#
+# Replace the placeholder domain below with the real one once registered.
+# Caddy obtains and renews the HTTPS certificate automatically (Let's Encrypt)
+# as soon as the domain's A record points at the server.
+# =============================================================================
+
+# TODO: set a real contact email for Let's Encrypt expiry notices, e.g.:
+# {
+#     email zack.logan@example.com
+# }
+
+lakenzie.example.com {
+    # API → FastAPI container (service name "api" on the compose network)
+    reverse_proxy /api/* api:8000
+
+    # Everything else: the built SPA. try_files falls back to /index.html so
+    # client-side routes like /games/wordle work on direct load / refresh.
+    root * /srv
+    encode gzip
+    try_files {path} /index.html
+    file_server
+}
