@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { alpha, useTheme } from '@mui/material/styles';
+//import { alpha, useTheme } from '@mui/material/styles';
 
 /** tiny inline SVG grain, tiled — no colors involved */
 const NOISE_URL =
