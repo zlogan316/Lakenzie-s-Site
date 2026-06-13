@@ -10,8 +10,11 @@ __pycache__/
 .pytest_cache/
 
 # --- Secrets / local config ---
-# (.env.example IS committed — it documents the variables)
 .env
+
+# --- Local tool state ---
+.claude/settings.local.json
+.playwright-mcp/
 
 # --- Editor cruft ---
 .vscode/

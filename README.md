@@ -4,39 +4,31 @@ A gift website for Lakenzie — a small personal site with daily-style word game
 (Wordle, Connections) built just for her.
 
 - **Frontend:** React + Vite + MUI (TypeScript), in `frontend\`
-- **Backend:** FastAPI + SQLAlchemy + SQL Server (Python), in `backend\`
+- **Backend:** Node + Express, in `backend\`
 
 ## Quickstart
 
-The easy way (opens both servers in split panes):
+One command starts everything (run from the repo root):
 
-```powershell
-.\dev.ps1
+```sh
+npm install   # first time only — installs backend + frontend deps
+npm start
 ```
 
-Or run each side by hand:
+`npm start` launches the backend and the Vite web server together and opens the
+site in your browser.
 
-```powershell
-# Backend (http://localhost:8000)
-cd backend
-.\.venv\Scripts\Activate.ps1
-uvicorn app.main:app --reload --port 8000
+- Frontend (the website): http://localhost:5173
+- Backend (API): http://localhost:3001
 
-# Frontend (Vite dev server, in a second terminal)
-cd frontend
-npm run dev
+Run each side on its own if you want:
+
+```sh
+npm run start:backend    # http://localhost:3001
+npm run start:frontend   # http://localhost:5173
 ```
-
-> **Database is optional for now.** The site runs without SQL Server until the
-> games feature is wired up. When you're ready, copy `.env.example` to `.env`
-> at the repo root and set `DATABASE_URL` (examples are in the file).
 
 ## Where to read more
 
-- [`docs/STACK.md`](docs/STACK.md) — plain-English tour of every language and
-  package in the stack, and why each was chosen.
-- [`docs/games-design.md`](docs/games-design.md) — design for the games feature
-  (schema, never-see-the-same-puzzle-twice logic, API sketch, open questions).
-- [`deploy/README.md`](deploy/README.md) — Phase 2 production deployment plan
-  (Lightsail + Docker + Caddy). Everything in `deploy\` is **inert** and not
-  used for local development.
+- [`docs/games-design.md`](docs/games-design.md) — early design notes for the
+  games feature (rules, puzzle ideas, open questions).
