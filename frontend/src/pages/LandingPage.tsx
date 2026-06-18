@@ -40,7 +40,7 @@ export function LandingPage() {
           variant="h1"
           sx={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)', mb: 2.5 }}
         >
-          Lakenzie&apos;s Lovely Website
+          LaKenzie&apos;s Lovely Website
         </Typography>
         <Typography
           variant="h3"

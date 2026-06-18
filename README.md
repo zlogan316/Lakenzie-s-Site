@@ -1,6 +1,6 @@
-# Lakenzie's Site
+# LaKenzie's Site
 
-A gift website for Lakenzie — a small personal site with daily-style word games
+A gift website for LaKenzie — a small personal site with daily-style word games
 (Wordle, Connections) built just for her.
 
 - **Frontend:** React + Vite + MUI (TypeScript), in `frontend\`
