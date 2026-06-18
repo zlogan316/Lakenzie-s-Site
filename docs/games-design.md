@@ -6,7 +6,7 @@ code yet.
 
 ## Goals
 
-- Lakenzie should **never see the same puzzle twice** — enforced by the
+- LaKenzie should **never see the same puzzle twice** — enforced by the
   database, not by client-side luck.
 - Server-authoritative: the browser never receives the answer, only verdicts.
 - One generic schema that supports many game types without new tables.

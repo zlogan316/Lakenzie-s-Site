@@ -10,6 +10,10 @@ export const palette = {
   coral: '#DB504A',
   brown: '#583E23',
 
+  // sky blues for the landing backdrop gradient
+  navy: '#15233D',
+  brightBlue: '#2BA3E3',
+
   // derived surfaces
   cream: '#FBF3E4',
   paper: '#FFFDF7',
