@@ -17,6 +17,9 @@ export const palette = {
   // derived surfaces
   cream: '#FBF3E4',
   paper: '#FFFDF7',
+  /** the departure wash — deliberately pure white rather than cream, so the seeds blow out
+   *  brighter than the site's cream loading veil */
+  white: '#FFFFFF',
 
   // muted "absent tile" tone (warm grey-brown)
   absent: '#9B8A76',
