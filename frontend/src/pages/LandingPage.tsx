@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -21,8 +21,11 @@ import {
  *  past even ultrawide aspect ratios. Extra tiles off-screen are clipped — cheap, one cached SVG. */
 const CLOUD_TILES_PER_REEL = 16;
 
-/** The scene is a fixed-height stage; every layer is placed as a fraction of it. */
-const PAGE_HEIGHT = 1800;
+/** The scene is a fixed-height stage; every layer is placed as a fraction of it, so this is the one
+ *  number that scales the whole scene vertically — the cloud band, the card, and the tile size that
+ *  follows the band all move with it. Horizontal sizes are percentages of the viewport instead, so
+ *  they are deliberately unaffected. */
+const PAGE_HEIGHT = 1300;
 
 /** Where the cloud band sits on the page, in percent. */
 const CLOUD_BAND_TOP_PCT = 5;
@@ -30,25 +33,38 @@ const CLOUD_BAND_HEIGHT_PCT = 60;
 /** Fraction of clouds.svg's own height that holds cloud shapes — the rest of the file is empty sky.
  *  Measured from its path extents (curve control points included) in the 297x210 viewBox. */
 const CLOUD_ART_BOTTOM = 0.6;
-/** How far down the page the lowest cloud actually reaches — 57.6%, not the band's 85%. */
+/** How far down the page the lowest cloud actually reaches — 41%, not the band's 65%, because the
+ *  bottom two fifths of the band is empty sky. */
 const CLOUDS_BOTTOM_PCT = CLOUD_BAND_TOP_PCT + CLOUD_BAND_HEIGHT_PCT * CLOUD_ART_BOTTOM;
-/** Gap between the lowest cloud and the top of the card. */
+
+/** How far the card's top rises past the lowest cloud, as a percentage of the page. At 0 the two
+ *  merely touch, which reads as the card hanging below the clouds; a small overlap reads as it
+ *  tucking up behind them. */
+const CARD_CLOUD_OVERLAP_PCT = 3;
 
 /** The card is placed like the scene art — a layer with top and bottom each a % of the page, so its
- *  height is whatever sits between them and scales with PAGE_HEIGHT. Top clears the clouds; bottom
- *  is how close it comes to the page's bottom edge. */
-const CARD_TOP_PCT = CLOUDS_BOTTOM_PCT;
+ *  height is whatever sits between them and scales with PAGE_HEIGHT.
+ *
+ *  CARD_BOTTOM_PCT is load-bearing for how the card reads: DrawstringCard is anchored at its top and
+ *  only changes height, so this alone fixes where the expanded card's bottom edge sits. Raising the
+ *  top makes the card taller without moving that edge — change the top freely, leave this be. */
+const CARD_TOP_PCT = CLOUDS_BOTTOM_PCT - CARD_CLOUD_OVERLAP_PCT;
 const CARD_BOTTOM_PCT = 2;
 
-/** The two dandelions and where each one leads. Order is left-to-right on the page. */
+/** The two dandelions and where each one leads. Order is left-to-right on the page. The right one's
+ *  left is the mirror of the left one's: 100 - 12 - 7.5 (the flower's own width), so the pair sits
+ *  symmetrically about the page centre. At a plain 80% it was half a percent off and read as uneven. */
 const DANDELIONS = [
   { to: '/games', label: 'Games', left: '12%', mirrored: false },
-  { to: '/fun-facts', label: 'Fun Facts', left: '80%', mirrored: true },
+  { to: '/fun-facts', label: 'Fun Facts', left: '80.5%', mirrored: true },
 ] as const;
 
 export function LandingPage() {
   const navigate = useNavigate();
   const [departingTo, setDepartingTo] = useState<string | null>(null);
+
+  /** Holds the preloaded frame images for the page's lifetime so their decoded bitmaps survive. */
+  const warmedFrames = useRef<HTMLImageElement[]>([]);
 
   // reduced motion holds the resting frame and just cross-fades, matching how the cloud
   // drift already opts out
@@ -72,25 +88,34 @@ export function LandingPage() {
     setDepartingTo(to);
   };
 
-  // Warm the animation frames after first paint so the first click plays smoothly. Deliberately
-  // NOT added to AppShell's PRELOAD array: that gates the cream loading veil over the entire
-  // site, and holding first paint for animation art nobody has asked for yet is the wrong trade.
-  // Preloading on hover was rejected too — phones have no hover, so a first tap would enter an
-  // unloaded animation. A frame that 404s simply stays unloaded and plays as a gap.
+  // Warm the animation frames so the first click plays smoothly. Deliberately NOT added to
+  // AppShell's PRELOAD array: that gates the cream loading veil over the entire site, and holding
+  // first paint for animation art nobody has asked for yet is the wrong trade. Preloading on hover
+  // was rejected too — phones have no hover, so a first tap would enter an unloaded animation.
   useEffect(() => {
-    let cancelled = false;
-    const id = window.setTimeout(() => {
-      if (cancelled) return;
-      // frame 0 is already on screen; the rest are what need warming
-      assets.dandelionFrames.slice(1).forEach((f) => {
+    const start = () => {
+      // frame 0 is already on screen; the rest are what need warming. Held in a ref, not dropped
+      // on the floor: the browser keeps an image's decoded bitmap while something references it,
+      // and letting these go out of scope means re-decoding every frame during playback.
+      warmedFrames.current = assets.dandelionFrames.slice(1).map((src) => {
         const img = new Image();
-        img.src = f.src;
+        img.src = src;
+        // src alone only fetches the bytes — a PNG this size stays undecoded until something
+        // paints it, which during a 100ms-per-frame flipbook is far too late. decode() forces it
+        // now. A 404 or an abort must not break the page, hence the swallow.
+        void img.decode().catch(() => {});
+        return img;
       });
-    }, 500);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(id);
     };
+
+    // Waiting for `load` rather than an arbitrary timer: it means ~1.9MB of frames never competes
+    // for bandwidth with the hill and clouds, which DO gate the loading veil.
+    if (document.readyState === 'complete') {
+      start();
+      return;
+    }
+    window.addEventListener('load', start, { once: true });
+    return () => window.removeEventListener('load', start);
   }, []);
 
   return (
@@ -237,7 +262,6 @@ export function LandingPage() {
             <DandelionLink
               key={d.to}
               frame={isDeparting ? frames[frameIndex] : frames[0]}
-              resting={frames[0]}
               label={d.label}
               to={d.to}
               left={d.left}

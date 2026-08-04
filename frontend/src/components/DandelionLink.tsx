@@ -3,14 +3,27 @@ import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { palette } from '../theme/palette';
-import type { DandelionFrame } from '../assets';
+import { DANDELION_PAGE_MM } from '../assets';
 
-/** Where the stem base sits inside the RESTING frame's canvas, as a fraction of it: x from the
- *  left edge, y from the top. Frame 1 is cropped tight to the flower, so the stem base is its
- *  bottom centre. Later frames derive their own anchor from this — see the maths below. */
-const STEM_ANCHOR = { x: 0.5, y: 1 };
+/** Where the stem base sits on the shared export page, as a fraction of it: x from the left edge,
+ *  y from the top. Measured off the exported frames, where it is identical in every one of them to
+ *  within a pixel — that shared position is what keeps the flower planted while the seeds move.
+ *  It doubles as the transform origin, so mirroring and the hover scale both pivot on the ground. */
+const STEM_ANCHOR = { x: 0.332, y: 0.8536 };
 
-/** Aspect ratio of the resting flower, taken from Dandelion1.svg's viewBox (27.675 x 65.392mm). */
+/** The flower's own width in mm, from Dandelion1's original crop-to-content export. This is the
+ *  flower itself, NOT the page it sits on, and it does not change when the frames are re-exported
+ *  on a larger page. */
+const FLOWER_WIDTH_MM = 27.675169;
+
+/** How much wider the frame image is than the flower on screen. The page is 300mm and the flower
+ *  only 27.7mm of it, so the element is ~10.8x the flower's width and mostly transparent — that is
+ *  what renders the flower at FLOWER_WIDTH_PCT while letting the seeds spill across the page. */
+const FRAME_SCALE = DANDELION_PAGE_MM / FLOWER_WIDTH_MM;
+
+/** Aspect ratio of the flower itself, from the original crop-to-content export (27.675 x 65.392mm).
+ *  This shapes the small interactive wrapper, which is flower-sized — not the frame image, which is
+ *  the whole square page. */
 const FLOWER_ASPECT = '27.675 / 65.392';
 
 /** Flower width as a percentage of the Container — preserves the scene's current proportions. */
@@ -20,11 +33,28 @@ const FLOWER_WIDTH_PCT = 7.5;
  *  page. Negative so the stem runs off the bottom edge and gets clipped by the page's overflow. */
 const DANDELION_BOTTOM_PCT = -3;
 
+/** How much the flower swells on hover/focus. Named rather than inline because the label's
+ *  clearance is derived from it — at rest the flower exactly fills the wrapper, so any growth goes
+ *  straight into the text sitting above it. */
+const HOVER_SCALE = 1.04;
+
+/** Label placement, relative to the flower rather than the page so it holds at any viewport.
+ *
+ *  `bottom` is a percentage of the flower's height measured up from its base, and the label is
+ *  centred on that line rather than sitting above it. 75.7 is the bud's own centre, measured off the
+ *  exported frames: bud centroid at 0.6885 of the page, stem base at 0.8536, flower 0.218 of the
+ *  page tall. Aiming at the bud is what makes the label read as labelling the head instead of
+ *  floating near it — the previous 88 put it above the flower entirely, which looked adrift.
+ *
+ *  `side` is a percentage of the flower's width from whichever edge the label hangs off, so anything
+ *  over 100 clears the flower. The bud sits about 0.29 flower-widths off-centre, so the mirrored
+ *  flower's head leans the other way and its label follows — 125 leaves the same head-to-label gap
+ *  on both sides. */
+const LABEL_POS = { bottom: 75.7, side: 125 };
+
 type Props = {
   /** which frame to paint right now — the resting frame unless this one is departing */
-  frame: DandelionFrame;
-  /** the resting frame, which sets the scale every other frame is measured against */
-  resting: DandelionFrame;
+  frame: string;
   /** destination name, shown on hover/focus and used as the link's accessible name */
   label: string;
   to: string;
@@ -39,7 +69,6 @@ type Props = {
 
 export function DandelionLink({
   frame,
-  resting,
   label,
   to,
   left,
@@ -47,27 +76,6 @@ export function DandelionLink({
   departing = false,
   onActivate,
 }: Props) {
-  // Every frame is cropped tight to its own content, so a frame whose canvas is 6.8x wider in mm
-  // must render 6.8x wider on screen for the flower inside it to stay the same size. Without this
-  // the flower shrinks away as the canvas fills up with seeds.
-  const scale = frame.width / resting.width;
-
-  // The crop grows right and up as the seeds spread, leaving the bottom-left corner fixed. The
-  // frame offsets bear this out: frames 1 and 2 share an identical content offset while only the
-  // width grows (left edge fixed), and the offsets move the content progressively further down
-  // each canvas (space added at the top, so the bottom edge is fixed).
-  //
-  // So what stays constant is the stem's distance from the LEFT and from the BOTTOM, and the
-  // anchor is that fixed distance as a fraction of each frame's own canvas. Measuring y from the
-  // top instead is what sank the flower: on frame 10 that put the anchor 31% down a canvas whose
-  // stem sits at the very bottom.
-  // A frame can override the inferred position outright — by the late frames the seeds spread in
-  // every direction, so the crop expands on all four sides and the fixed-corner assumption breaks.
-  const stemFromLeftMm = STEM_ANCHOR.x * resting.width;
-  const stemFromBottomMm = (1 - STEM_ANCHOR.y) * resting.height;
-  const anchorX = frame.stem?.x ?? stemFromLeftMm / frame.width;
-  const anchorY = frame.stem?.y ?? 1 - stemFromBottomMm / frame.height;
-
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     // let the browser handle modified and non-primary clicks, so open-in-new-tab, middle-click
     // and copy-link keep behaving like the real links these are
@@ -98,7 +106,7 @@ export function DandelionLink({
         '&:hover .dandelion-label, &:focus-visible .dandelion-label': { opacity: 1 },
         '&:hover .dandelion-frame, &:focus-visible .dandelion-frame': {
           filter: `drop-shadow(0 0 0.4em ${palette.goldSoft})`,
-          scale: '1.04',
+          scale: String(HOVER_SCALE),
         },
         // filter is dropped in forced-colors mode, so focus needs a real outline as well
         '&:focus-visible': {
@@ -110,16 +118,22 @@ export function DandelionLink({
       <Typography
         className="dandelion-label"
         component="span"
+        variant="h4"
         sx={{
           position: 'absolute',
-          bottom: '100%',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          // measured against the flower-sized wrapper — see LABEL_POS. The mirrored flower anchors
+          // from the opposite edge, so the pair splays outward and matches the flipped artwork
+          // instead of both labels trailing off to the right.
+          bottom: `${LABEL_POS.bottom}%`,
+          ...(mirrored
+            ? { right: `${LABEL_POS.side}%` }
+            : { left: `${LABEL_POS.side}%` }),
+          // centres the label on the bud's line instead of resting its baseline there
+          transform: 'translateY(50%)',
           whiteSpace: 'nowrap',
           opacity: 0,
           transition: 'opacity 200ms ease',
           color: palette.brown,
-          fontWeight: 700,
           // halo so the name reads over the cream card and the sky alike
           textShadow: `0 0 0.3em ${palette.cream}, 0 0 0.6em ${palette.cream}`,
           // kept out of the hit area: at opacity 0 it would still catch the pointer above the flower
@@ -132,20 +146,21 @@ export function DandelionLink({
       <Box
         className="dandelion-frame"
         component="img"
-        src={frame.src}
+        src={frame}
         alt=""
         draggable={false}
         sx={{
           position: 'absolute',
-          // the wrapper's bottom centre is the ground the flower stands on
+          // the wrapper's bottom centre is the ground the flower stands on; the translate below
+          // slides the image so its stem base lands exactly there, seeds overflowing freely
           left: '50%',
           top: '100%',
-          width: `${100 * scale}%`,
+          width: `${100 * FRAME_SCALE}%`,
           // origin at the stem base means mirroring and the hover scale both pivot on the ground:
           // the flower never slides sideways or lifts off when either is applied
-          transformOrigin: `${anchorX * 100}% ${anchorY * 100}%`,
+          transformOrigin: `${STEM_ANCHOR.x * 100}% ${STEM_ANCHOR.y * 100}%`,
           transform:
-            `translate(${-100 * anchorX}%, ${-100 * anchorY}%)` +
+            `translate(${-100 * STEM_ANCHOR.x}%, ${-100 * STEM_ANCHOR.y}%)` +
             (mirrored ? ' scaleX(-1)' : ''),
           transition: 'filter 200ms ease, scale 200ms ease',
           // never the hit area — that belongs to the small wrapper above
