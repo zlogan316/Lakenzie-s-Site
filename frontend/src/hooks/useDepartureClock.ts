@@ -7,22 +7,17 @@ export const DEPARTURE_MS = 1100;
 /** Reduced-motion departures skip the flipbook entirely and just cross-fade. */
 export const REDUCED_DEPARTURE_MS = 250;
 
-/** Fraction of the departure that plays at full clarity before the white wash starts ramping.
- *  The early frames are where the seeds visibly detach; the wash then covers the busiest ones. */
-const WASH_START = 0.6;
-
 /** How long after the expected end we force completion if rAF never delivers a final tick. */
 const SAFETY_MS = 2000;
 
 export type DepartureState = {
   frameIndex: number;
-  washOpacity: number;
   done: boolean;
 };
 
 /**
- * Derives everything the departure renders from elapsed time alone. Pure — no DOM, no clock — so
- * the frames and the wash are guaranteed to stay in lockstep and this is trivially checkable.
+ * Derives what the departure renders from elapsed time alone. Pure — no DOM, no clock — so it is
+ * trivially checkable and cannot drift from whatever else reads the same elapsed value.
  *
  * Pass frameCount 1 to freeze on the resting frame (how reduced motion is expressed).
  */
@@ -34,8 +29,7 @@ export function departureState(
   const progress = durationMs <= 0 ? 1 : Math.min(1, Math.max(0, elapsedMs / durationMs));
   const frameIndex =
     frameCount <= 1 ? 0 : Math.min(frameCount - 1, Math.floor(progress * frameCount));
-  const washOpacity = progress <= WASH_START ? 0 : (progress - WASH_START) / (1 - WASH_START);
-  return { frameIndex, washOpacity, done: progress >= 1 };
+  return { frameIndex, done: progress >= 1 };
 }
 
 /**

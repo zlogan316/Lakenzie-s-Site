@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -12,26 +12,18 @@ export function AppShell() {
   const [loading, setLoading] = useState(true);
 
   const location = useLocation();
-  const [arriving, setArriving] = useState(false);
   const firstRender = useRef(true);
 
-  // The dandelion departure hands over at full white, so a new route starts under a white veil and
-  // fades it out — otherwise the destination snaps in. Focus moves to the page heading in the same
-  // beat: a programmatic navigate() otherwise drops keyboard focus with no indication anything
-  // happened.
-  //
-  // useLayoutEffect, not useEffect: the departure wash lives on the page being left, so it
-  // unmounts the moment the route changes. Applying this veil after paint would leave one frame
-  // where neither is covering, flashing the destination through.
-  useLayoutEffect(() => {
+  // Move focus to the new page's heading on every client-side navigation. A programmatic navigate()
+  // leaves keyboard focus wherever it was — usually the document top — with nothing to indicate the
+  // page changed, so a keyboard or screen-reader user has no idea anything happened. Skipped on the
+  // first render because a fresh page load should not steal focus.
+  useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
       return;
     }
-    setArriving(true);
     document.getElementById('page-heading')?.focus();
-    const id = window.setTimeout(() => setArriving(false), 400);
-    return () => window.clearTimeout(id);
   }, [location.pathname]);
 
   // Hold a cream veil over everything until the background art has loaded.
@@ -92,23 +84,6 @@ export function AppShell() {
       <Box component="main" sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Outlet />
       </Box>
-
-      {/* arrival veil — picks up where the departure wash left off and fades the new page in.
-          transition is none on the way in so it appears instantly at full white; the fade only
-          runs on the way out. Hidden at rest so it never blocks anything. */}
-      <Box
-        aria-hidden
-        sx={{
-          position: 'fixed',
-          inset: 0,
-          bgcolor: palette.white,
-          opacity: arriving ? 1 : 0,
-          transition: arriving ? 'none' : 'opacity 400ms ease',
-          visibility: arriving ? 'visible' : 'hidden',
-          pointerEvents: 'none',
-          zIndex: (theme) => theme.zIndex.modal + 2,
-        }}
-      />
 
       {/* full-screen loading veil — cream background + spinner, covering every page until ready */}
       {loading && (

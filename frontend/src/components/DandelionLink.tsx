@@ -4,12 +4,14 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { palette } from '../theme/palette';
 import { DANDELION_PAGE_MM } from '../assets';
+import type { DandelionFrame } from '../assets';
 
-/** Where the stem base sits on the shared export page, as a fraction of it: x from the left edge,
- *  y from the top. Measured off the exported frames, where it is identical in every one of them to
- *  within a pixel — that shared position is what keeps the flower planted while the seeds move.
- *  It doubles as the transform origin, so mirroring and the hover scale both pivot on the ground. */
-const STEM_ANCHOR = { x: 0.332, y: 0.8536 };
+/** How far down the export page the stem base sits, as a fraction of the page height. Measured off
+ *  the frames, where it is identical in all thirteen. The horizontal counterpart is per-frame and
+ *  lives on the frame itself — see `stemX` in assets.ts for why. Together they keep the flower
+ *  planted, and they double as the transform origin so mirroring and the hover scale pivot on the
+ *  ground rather than the image's centre. */
+const STEM_ANCHOR_Y = 0.877;
 
 /** The flower's own width in mm, from Dandelion1's original crop-to-content export. This is the
  *  flower itself, NOT the page it sits on, and it does not change when the frames are re-exported
@@ -54,7 +56,7 @@ const LABEL_POS = { bottom: 75.7, side: 125 };
 
 type Props = {
   /** which frame to paint right now — the resting frame unless this one is departing */
-  frame: string;
+  frame: DandelionFrame;
   /** destination name, shown on hover/focus and used as the link's accessible name */
   label: string;
   to: string;
@@ -146,7 +148,7 @@ export function DandelionLink({
       <Box
         className="dandelion-frame"
         component="img"
-        src={frame}
+        src={frame.src}
         alt=""
         draggable={false}
         sx={{
@@ -158,9 +160,9 @@ export function DandelionLink({
           width: `${100 * FRAME_SCALE}%`,
           // origin at the stem base means mirroring and the hover scale both pivot on the ground:
           // the flower never slides sideways or lifts off when either is applied
-          transformOrigin: `${STEM_ANCHOR.x * 100}% ${STEM_ANCHOR.y * 100}%`,
+          transformOrigin: `${frame.stemX * 100}% ${STEM_ANCHOR_Y * 100}%`,
           transform:
-            `translate(${-100 * STEM_ANCHOR.x}%, ${-100 * STEM_ANCHOR.y}%)` +
+            `translate(${-100 * frame.stemX}%, ${-100 * STEM_ANCHOR_Y}%)` +
             (mirrored ? ' scaleX(-1)' : ''),
           transition: 'filter 200ms ease, scale 200ms ease',
           // never the hit area — that belongs to the small wrapper above

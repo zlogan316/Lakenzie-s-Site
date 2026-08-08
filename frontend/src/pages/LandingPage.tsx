@@ -72,15 +72,11 @@ export function LandingPage() {
   const durationMs = reducedMotion ? REDUCED_DEPARTURE_MS : DEPARTURE_MS;
   const frames = assets.dandelionFrames;
 
-  // one clock drives both the frames and the wash, so they cannot drift apart
+  // one clock drives the flipbook and fires the navigation at the end of it
   const elapsed = useDepartureClock(departingTo !== null, durationMs, () => {
     if (departingTo) navigate(departingTo);
   });
-  const { frameIndex, washOpacity } = departureState(
-    elapsed,
-    reducedMotion ? 1 : frames.length,
-    durationMs,
-  );
+  const { frameIndex } = departureState(elapsed, reducedMotion ? 1 : frames.length, durationMs);
 
   const startDeparture = (to: string) => {
     // ignore repeat clicks and the other flower while one departure is already running
@@ -97,9 +93,9 @@ export function LandingPage() {
       // frame 0 is already on screen; the rest are what need warming. Held in a ref, not dropped
       // on the floor: the browser keeps an image's decoded bitmap while something references it,
       // and letting these go out of scope means re-decoding every frame during playback.
-      warmedFrames.current = assets.dandelionFrames.slice(1).map((src) => {
+      warmedFrames.current = assets.dandelionFrames.slice(1).map((frame) => {
         const img = new Image();
-        img.src = src;
+        img.src = frame.src;
         // src alone only fetches the bytes — a PNG this size stays undecoded until something
         // paints it, which during a 100ms-per-frame flipbook is far too late. decode() forces it
         // now. A 404 or an abort must not break the page, hence the swallow.
@@ -272,22 +268,6 @@ export function LandingPage() {
           );
         })}
       </Container>
-
-      {/* departure wash — fixed so it covers the whole viewport including the gold frame, and
-          stacked above AppShell's loading veil (modal + 1) so nothing shows through */}
-      {departingTo !== null && (
-        <Box
-          aria-hidden
-          sx={{
-            position: 'fixed',
-            inset: 0,
-            bgcolor: palette.white,
-            opacity: washOpacity,
-            pointerEvents: 'none',
-            zIndex: (theme) => theme.zIndex.modal + 2,
-          }}
-        />
-      )}
     </Box>
   );
 }
