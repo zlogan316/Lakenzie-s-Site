@@ -1,4 +1,3 @@
-/** Minimal JSON fetch wrapper. Paths are relative (proxied to the backend in dev). */
 
 export class ApiError extends Error {
   status: number;
@@ -22,7 +21,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         message = String((body as { detail: unknown }).detail);
       }
     } catch {
-      /* non-JSON error body — keep the default message */
     }
     throw new ApiError(message, res.status);
   }

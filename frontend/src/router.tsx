@@ -12,8 +12,6 @@ export const router = createBrowserRouter([
       { index: true, Component: LandingPage },
       { path: 'games', Component: GamesPage },
       { path: 'fun-facts', Component: FunFactsPage },
-      // future: { path: 'games/word-guess', Component: WordGuessPage },
-      // future: { path: 'games/connections', Component: ConnectionsPage },
     ],
   },
 ]);

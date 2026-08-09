@@ -2,8 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { palette } from '../theme/palette';
 
-/** Placeholder destination for the right dandelion. Name is provisional; the route can change
- *  with no impact on the transition, since destinations are props on DandelionLink. */
 export function FunFactsPage() {
   return (
     <Box

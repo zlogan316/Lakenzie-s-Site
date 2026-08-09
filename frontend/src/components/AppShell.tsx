@@ -5,7 +5,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { palette } from '../theme/palette';
 import { assets } from '../assets';
 
-/** Heavy art that must be ready before we reveal the page. */
 const PRELOAD = [assets.hill, assets.clouds];
 
 export function AppShell() {
@@ -14,10 +13,6 @@ export function AppShell() {
   const location = useLocation();
   const firstRender = useRef(true);
 
-  // Move focus to the new page's heading on every client-side navigation. A programmatic navigate()
-  // leaves keyboard focus wherever it was — usually the document top — with nothing to indicate the
-  // page changed, so a keyboard or screen-reader user has no idea anything happened. Skipped on the
-  // first render because a fresh page load should not steal focus.
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
@@ -26,7 +21,6 @@ export function AppShell() {
     document.getElementById('page-heading')?.focus();
   }, [location.pathname]);
 
-  // Hold a cream veil over everything until the background art has loaded.
   useEffect(() => {
     let done = false;
     const finish = () => {
@@ -43,12 +37,11 @@ export function AppShell() {
     const imgs = PRELOAD.map((src) => {
       const img = new Image();
       img.onload = onOne;
-      img.onerror = onOne; // a missing asset shouldn't trap the user
+      img.onerror = onOne;
       img.src = src;
       return img;
     });
 
-    // safety net: never strand the user behind the veil if an asset stalls
     const fallback = window.setTimeout(finish, 15000);
 
     return () => {
@@ -69,7 +62,6 @@ export function AppShell() {
         bgcolor: 'background.default',
       }}
     >
-      {/* gold frame around the whole site, fixed to the viewport edges */}
       <Box
         aria-hidden
         sx={{
@@ -85,7 +77,6 @@ export function AppShell() {
         <Outlet />
       </Box>
 
-      {/* full-screen loading veil — cream background + spinner, covering every page until ready */}
       {loading && (
         <Box
           role="status"
