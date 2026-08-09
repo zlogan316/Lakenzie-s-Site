@@ -19,18 +19,23 @@ const CLOUD_TILES_PER_REEL = 16;
 const PAGE_HEIGHT = 1300;
 
 const CLOUD_BAND_TOP_PCT = 5;
-const CLOUD_BAND_HEIGHT_PCT = 60;
+const CLOUD_BAND_HEIGHT_PCT = { xs: 38, sm: 60 };
 const CLOUD_ART_BOTTOM = 0.6;
-const CLOUDS_BOTTOM_PCT = CLOUD_BAND_TOP_PCT + CLOUD_BAND_HEIGHT_PCT * CLOUD_ART_BOTTOM;
 
 const CARD_CLOUD_OVERLAP_PCT = 3;
 
-const CARD_TOP_PCT = CLOUDS_BOTTOM_PCT - CARD_CLOUD_OVERLAP_PCT;
-const CARD_BOTTOM_PCT = 2;
+const cardTopPct = (bandHeightPct: number) =>
+  CLOUD_BAND_TOP_PCT + bandHeightPct * CLOUD_ART_BOTTOM - CARD_CLOUD_OVERLAP_PCT;
+
+const CARD_TOP_PCT = {
+  xs: cardTopPct(CLOUD_BAND_HEIGHT_PCT.xs),
+  sm: cardTopPct(CLOUD_BAND_HEIGHT_PCT.sm),
+};
+const CARD_BOTTOM_PCT = { xs: 5, sm: 2 };
 
 const DANDELIONS = [
-  { to: '/games', label: 'Games', left: '12%', mirrored: false },
-  { to: '/fun-facts', label: 'Fun Facts', left: '80.5%', mirrored: true },
+  { to: '/games', label: 'Games', left: { xs: '8%', sm: '11%', md: '12%' }, mirrored: false },
+  { to: '/fun-facts', label: 'Fun Facts', left: { xs: '72%', sm: '79%', md: '80.5%' }, mirrored: true },
 ] as const;
 
 let framesWarmed = false;
@@ -40,7 +45,7 @@ const CLOUD_BAND_SX = {
   left: 0,
   right: 0,
   top: `${CLOUD_BAND_TOP_PCT}%`,
-  height: `${CLOUD_BAND_HEIGHT_PCT}%`,
+  height: { xs: `${CLOUD_BAND_HEIGHT_PCT.xs}%`, sm: `${CLOUD_BAND_HEIGHT_PCT.sm}%` },
   zIndex: 0,
   overflow: 'hidden',
   pointerEvents: 'none',
@@ -134,7 +139,7 @@ export function LandingPage() {
       sx={{
         position: 'relative',
         flex: 1,
-        minHeight: PAGE_HEIGHT,
+        minHeight: { xs: '100%', sm: PAGE_HEIGHT },
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -149,14 +154,14 @@ export function LandingPage() {
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: -50,
+          bottom: { xs: '-3.85%', sm: -50 },
           height: '100%',
           zIndex: 0,
           pointerEvents: 'none',
           backgroundImage: cssUrl(assets.hill),
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center bottom',
-          backgroundSize: '100% auto',
+          backgroundSize: { xs: 'auto 100%', sm: '100% auto' },
         }}
       />
 
@@ -177,7 +182,7 @@ export function LandingPage() {
       >
         <Box
           sx={{
-            width: '80%',
+            width: { xs: '100%', sm: '80%' },
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
@@ -190,8 +195,8 @@ export function LandingPage() {
         <Box
           sx={{
             position: 'absolute',
-            top: `${CARD_TOP_PCT}%`,
-            bottom: `${CARD_BOTTOM_PCT}%`,
+            top: { xs: `${CARD_TOP_PCT.xs}%`, sm: `${CARD_TOP_PCT.sm}%` },
+            bottom: { xs: `${CARD_BOTTOM_PCT.xs}%`, sm: `${CARD_BOTTOM_PCT.sm}%` },
             left: '10%',
             right: '10%',
             display: 'flex',

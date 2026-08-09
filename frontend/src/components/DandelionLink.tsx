@@ -14,7 +14,7 @@ const FRAME_SCALE = DANDELION_PAGE_MM / FLOWER_WIDTH_MM;
 
 const FLOWER_ASPECT = '27.675 / 65.392';
 
-const FLOWER_WIDTH_PCT = 7.5;
+const FLOWER_WIDTH = { xs: '20%', sm: '10%', md: '7.5%' } as const;
 
 const DANDELION_BOTTOM_PCT = -3;
 
@@ -36,7 +36,7 @@ type Props = {
   frame: DandelionFrame;
   label: string;
   to: string;
-  left: string;
+  left: string | Partial<Record<'xs' | 'sm' | 'md', string>>;
   mirrored?: boolean;
   departing?: boolean;
   onActivate: (to: string) => void;
@@ -72,7 +72,7 @@ export function DandelionLink({
         position: 'absolute',
         left,
         bottom: `${DANDELION_BOTTOM_PCT}%`,
-        width: `${FLOWER_WIDTH_PCT}%`,
+        width: FLOWER_WIDTH,
         aspectRatio: FLOWER_ASPECT,
         display: 'block',
         textDecoration: 'none',
@@ -92,16 +92,17 @@ export function DandelionLink({
       <Typography
         className="dandelion-label"
         component="span"
-        variant="h4"
         sx={{
+          typography: { xs: 'h6', md: 'h4' },
           position: 'absolute',
-          bottom: `${LABEL_POS.bottom}%`,
+          bottom: { xs: '30%', md: `${LABEL_POS.bottom}%` },
           ...(mirrored
-            ? { right: `${LABEL_POS.side}%` }
-            : { left: `${LABEL_POS.side}%` }),
-          transform: 'translateY(50%)',
+            ? { left: { xs: '50%', md: 'auto' }, right: { xs: 'auto', md: `${LABEL_POS.side}%` } }
+            : { left: { xs: '50%', md: `${LABEL_POS.side}%` } }),
+          transform: { xs: 'translate(-50%, 50%)', md: 'translateY(50%)' },
           whiteSpace: 'nowrap',
-          opacity: 0,
+          zIndex: 1,
+          opacity: { xs: 1, md: 0 },
           transition: 'opacity 200ms ease',
           color: palette.brown,
           textShadow: `0 0 0.3em ${palette.cream}, 0 0 0.6em ${palette.cream}`,

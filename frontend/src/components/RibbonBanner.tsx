@@ -12,7 +12,7 @@ const VB_W = 600;
 const VB_H_STRIP = 90;
 const VB_H_RIBBON = 150;
 
-const STRIP = { top: 20, bottom: 65, inset: 20, notch: 24 };
+const STRIP = { top: 12, bottom: 78, inset: 20, notch: 24 };
 
 function stripPath(w: number, g: typeof STRIP): string {
   const mid = (g.top + g.bottom) / 2;
