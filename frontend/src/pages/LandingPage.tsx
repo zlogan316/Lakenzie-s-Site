@@ -5,7 +5,7 @@ import Container from '@mui/material/Container';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { palette } from '../theme/palette';
 import { assets, cssUrl } from '../assets';
-import { RibbonBanner } from '../components/RibbonBanner';
+import { RibbonBanner, RIBBON_ASPECT } from '../components/RibbonBanner';
 import { DrawstringCard } from '../components/DrawstringCard';
 import { DandelionLink } from '../components/DandelionLink';
 import {
@@ -16,22 +16,23 @@ import {
 
 const CLOUD_TILES_PER_REEL = 16;
 
-const PAGE_HEIGHT = 1300;
+const RIBBON_TOP_PCT = -7;
+const RIBBON_HEIGHT_PCT = 40;
 
-const CLOUD_BAND_TOP_PCT = 5;
+const CLOUD_BAND_TOP_PCT = { xs: 5, sm: -4 };
 const CLOUD_BAND_HEIGHT_PCT = { xs: 38, sm: 60 };
 const CLOUD_ART_BOTTOM = 0.6;
 
 const CARD_CLOUD_OVERLAP_PCT = 3;
 
-const cardTopPct = (bandHeightPct: number) =>
-  CLOUD_BAND_TOP_PCT + bandHeightPct * CLOUD_ART_BOTTOM - CARD_CLOUD_OVERLAP_PCT;
+const cardTopPct = (bandTopPct: number, bandHeightPct: number) =>
+  bandTopPct + bandHeightPct * CLOUD_ART_BOTTOM - CARD_CLOUD_OVERLAP_PCT;
 
 const CARD_TOP_PCT = {
-  xs: cardTopPct(CLOUD_BAND_HEIGHT_PCT.xs),
-  sm: cardTopPct(CLOUD_BAND_HEIGHT_PCT.sm),
+  xs: cardTopPct(CLOUD_BAND_TOP_PCT.xs, CLOUD_BAND_HEIGHT_PCT.xs),
+  sm: cardTopPct(CLOUD_BAND_TOP_PCT.sm, CLOUD_BAND_HEIGHT_PCT.sm),
 };
-const CARD_BOTTOM_PCT = { xs: 5, sm: 2 };
+const CARD_BOTTOM_PCT = { xs: 1.5, sm: 2 };
 
 const DANDELIONS = [
   { to: '/games', label: 'Games', left: { xs: '8%', sm: '11%', md: '12%' }, mirrored: false },
@@ -44,7 +45,7 @@ const CLOUD_BAND_SX = {
   position: 'absolute',
   left: 0,
   right: 0,
-  top: `${CLOUD_BAND_TOP_PCT}%`,
+  top: { xs: `${CLOUD_BAND_TOP_PCT.xs}%`, sm: `${CLOUD_BAND_TOP_PCT.sm}%` },
   height: { xs: `${CLOUD_BAND_HEIGHT_PCT.xs}%`, sm: `${CLOUD_BAND_HEIGHT_PCT.sm}%` },
   zIndex: 0,
   overflow: 'hidden',
@@ -139,7 +140,7 @@ export function LandingPage() {
       sx={{
         position: 'relative',
         flex: 1,
-        minHeight: { xs: '100%', sm: PAGE_HEIGHT },
+        minHeight: '100%',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -182,14 +183,32 @@ export function LandingPage() {
       >
         <Box
           sx={{
-            width: { xs: '100%', sm: '80%' },
+            width: { xs: '100%', sm: 'auto' },
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            position: { sm: 'absolute' },
+            left: { sm: 0 },
+            right: { sm: 0 },
+            top: { sm: `${RIBBON_TOP_PCT}%` },
+            height: { sm: `${RIBBON_HEIGHT_PCT}%` },
+            justifyContent: { sm: 'center' },
           }}
         >
-          <RibbonBanner title="LaKenzie's Lovely Website" />
+          <Box
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              height: { sm: '100%' },
+              aspectRatio: { sm: RIBBON_ASPECT },
+              maxWidth: { sm: '80%' },
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <RibbonBanner title="LaKenzie's Lovely Website" />
+          </Box>
         </Box>
 
         <Box

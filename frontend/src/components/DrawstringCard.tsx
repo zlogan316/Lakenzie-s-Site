@@ -5,6 +5,7 @@ import type {
   ReactNode,
 } from 'react';
 import Box from '@mui/material/Box';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { palette } from '../theme/palette';
@@ -15,10 +16,9 @@ const FULL_PULL_HEIGHT_FRACTION = 0.6;
 
 const CORD_RESTING_LENGTH_RATIO = 0.035;
 const CORD_THICKNESS_RATIO = 0.008;
-const BEAD_DIAMETER_RATIO = 0.05;
+const BEAD_DIAMETER_RATIO = { xs: 0.16, sm: 0.05 };
+const BEAD_BORDER_RATIO = CORD_THICKNESS_RATIO / BEAD_DIAMETER_RATIO.sm;
 const BEAD_MAX_GROWTH = 1.0;
-
-const STRING_CLEARANCE = `${(BEAD_DIAMETER_RATIO * 100).toFixed(2)}%`;
 
 const SPRING_EASING = 'cubic-bezier(.22,1,.36,1)';
 const CARD_COLLAPSE_MS = 520;
@@ -28,13 +28,6 @@ const RESPECT_REDUCED_MOTION = { '@media (prefers-reduced-motion: reduce)': { tr
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const fullPullFor = (cardHeight: number) => Math.max(cardHeight * FULL_PULL_HEIGHT_FRACTION, 1);
-
-function releasePointer(event: ReactPointerEvent) {
-  try {
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  } catch {
-  }
-}
 
 export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: SxProps<Theme> }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -48,14 +41,18 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
   const cardScaleY = isCollapsed ? COLLAPSED_SCALE_Y : 1;
   const bottomEdgeRise = (1 - cardScaleY) * cardHeight;
 
-  const beadRestingSize = cardWidth * BEAD_DIAMETER_RATIO;
+  const isMobile = useMediaQuery((t: Theme) => t.breakpoints.down('sm'));
+  const beadRatio = isMobile ? BEAD_DIAMETER_RATIO.xs : BEAD_DIAMETER_RATIO.sm;
+
+  const beadRestingSize = cardWidth * beadRatio;
+  const beadBorder = beadRestingSize * BEAD_BORDER_RATIO;
   const cordThickness = cardWidth * CORD_THICKNESS_RATIO;
 
   const snapBack = isDragging ? 'none' : `${SNAP_BACK_MS}ms ${SPRING_EASING}`;
 
   const beadShadow = `0 4px 12px ${alpha(palette.brown, 0.4)}`;
   const beadGlow =
-    `${beadShadow}, 0 0 0 ${Math.max(cordThickness, 2)}px ${alpha(palette.gold, 0.35)}` +
+    `${beadShadow}, 0 0 0 ${Math.max(beadBorder, 2)}px ${alpha(palette.gold, 0.35)}` +
     `, 0 0 ${beadRestingSize * 0.7}px ${alpha(palette.gold, 0.85)}`;
   const cordGlow = `0 0 ${Math.max(beadRestingSize * 0.4, 6)}px ${alpha(palette.gold, 0.7)}`;
 
@@ -88,27 +85,19 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
     }
   }, []);
 
-  const finishPull = useCallback(
-    (event: ReactPointerEvent) => {
-      if (!gesture.current.isActive) return;
-      gesture.current.isActive = false;
-      setIsDragging(false);
-      releasePointer(event);
-      clearDragStyles();
-      setIsCollapsed((collapsed) => !collapsed);
-    },
-    [clearDragStyles],
-  );
+  const finishPull = useCallback(() => {
+    if (!gesture.current.isActive) return;
+    gesture.current.isActive = false;
+    setIsDragging(false);
+    clearDragStyles();
+    setIsCollapsed((collapsed) => !collapsed);
+  }, [clearDragStyles]);
 
-  const abandonPull = useCallback(
-    (event: ReactPointerEvent) => {
-      gesture.current.isActive = false;
-      setIsDragging(false);
-      releasePointer(event);
-      clearDragStyles();
-    },
-    [clearDragStyles],
-  );
+  const abandonPull = useCallback(() => {
+    gesture.current.isActive = false;
+    setIsDragging(false);
+    clearDragStyles();
+  }, [clearDragStyles]);
 
   const togglePullFromKeyboard = useCallback((event: ReactKeyboardEvent) => {
     if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
@@ -123,7 +112,7 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
         width: '92%',
         display: 'flex',
         flexDirection: 'column',
-        pb: STRING_CLEARANCE,
+        pb: `${beadRatio * 100}%`,
         ...sx,
       }}
     >
@@ -166,8 +155,6 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
             flexDirection: 'column',
             alignItems: 'center',
             zIndex: 2,
-            '&:hover .ds-bead': { boxShadow: beadGlow },
-            '&:hover .ds-cord': { boxShadow: cordGlow },
             ...RESPECT_REDUCED_MOTION,
           }}
         >
@@ -180,6 +167,7 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
               opacity: isDragging ? 1 : 0,
               bgcolor: palette.brown,
               borderRadius: 999,
+              boxShadow: isDragging ? cordGlow : 'none',
               transition: `height ${snapBack}, opacity ${snapBack}, box-shadow 200ms ease`,
               ...RESPECT_REDUCED_MOTION,
             }}
@@ -201,12 +189,11 @@ export function DrawstringCard({ children, sx }: { children?: ReactNode; sx?: Sx
               height: beadRestingSize,
               borderRadius: '50%',
               bgcolor: palette.gold,
-              border: `${Math.max(cordThickness, 1)}px solid ${palette.brown}`,
-              boxShadow: beadShadow,
+              border: `${Math.max(beadBorder, 1)}px solid ${palette.brown}`,
+              boxShadow: isDragging ? beadGlow : beadShadow,
               cursor: isDragging ? 'grabbing' : 'grab',
               touchAction: 'none',
               transition: `transform ${snapBack}, box-shadow 200ms ease`,
-              '&:hover': { boxShadow: beadGlow },
               '&:focus-visible': { outline: 'none', boxShadow: beadGlow },
               ...RESPECT_REDUCED_MOTION,
             }}

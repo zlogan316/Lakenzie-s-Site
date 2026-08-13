@@ -18,7 +18,12 @@ const FLOWER_WIDTH = { xs: '20%', sm: '10%', md: '7.5%' } as const;
 
 const DANDELION_BOTTOM_PCT = -3;
 
-const HOVER_SCALE = 1.04;
+const HIGHLIGHT_SCALE = 1.04;
+
+const HIGHLIGHT_FRAME = {
+  filter: `drop-shadow(0 0 0.4em ${palette.goldSoft})`,
+  scale: String(HIGHLIGHT_SCALE),
+};
 
 const LABEL_POS = { bottom: 75.7, side: 125 };
 
@@ -78,10 +83,11 @@ export function DandelionLink({
         textDecoration: 'none',
         overflow: 'visible',
         zIndex: departing ? 2 : 0,
-        '&:hover .dandelion-label, &:focus-visible .dandelion-label': { opacity: 1 },
-        '&:hover .dandelion-frame, &:focus-visible .dandelion-frame': {
-          filter: `drop-shadow(0 0 0.4em ${palette.goldSoft})`,
-          scale: String(HOVER_SCALE),
+        '&:focus-visible .dandelion-label': { opacity: 1 },
+        '&:active .dandelion-frame, &:focus-visible .dandelion-frame': HIGHLIGHT_FRAME,
+        '@media (hover: hover)': {
+          '&:hover .dandelion-label': { opacity: 1 },
+          '&:hover .dandelion-frame': HIGHLIGHT_FRAME,
         },
         '&:focus-visible': {
           outline: `2px solid ${palette.gold}`,
@@ -102,7 +108,7 @@ export function DandelionLink({
           transform: { xs: 'translate(-50%, 50%)', md: 'translateY(50%)' },
           whiteSpace: 'nowrap',
           zIndex: 1,
-          opacity: { xs: 1, md: 0 },
+          opacity: { xs: 1, md: departing ? 1 : 0 },
           transition: 'opacity 200ms ease',
           color: palette.brown,
           textShadow: `0 0 0.3em ${palette.cream}, 0 0 0.6em ${palette.cream}`,
@@ -128,6 +134,7 @@ export function DandelionLink({
             `translate(${-100 * frame.stemX}%, ${-100 * STEM_ANCHOR_Y}%)` +
             (mirrored ? ' scaleX(-1)' : ''),
           transition: 'filter 200ms ease, scale 200ms ease',
+          ...(departing && HIGHLIGHT_FRAME),
           clipPath: departing
             ? 'none'
             : `inset(${clipTopPct}% ${clipRightPct}% 0% ${clipLeftPct}%)`,

@@ -65,6 +65,8 @@ function ribbonPath(w: number, g: typeof RIBBON): string {
   ].join(' ');
 }
 
+export const RIBBON_ASPECT = `${VB_W} / ${VB_H_RIBBON}`;
+
 const STRIP_D = stripPath(VB_W, STRIP);
 const RIBBON_D = ribbonPath(VB_W, RIBBON);
 
