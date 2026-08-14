@@ -20,5 +20,3 @@ export const palette = {
   brownSoft: '#8A6E4F',
   creamDeep: '#F3E6CD',
 } as const;
-
-export type PaletteToken = keyof typeof palette;

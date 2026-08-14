@@ -5,14 +5,17 @@ import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import { palette } from '../theme/palette';
 
-interface GameCardProps {
+export function GameCard({
+  title,
+  description,
+  icon,
+  onOpen,
+}: {
   title: string;
   description: string;
   icon: ReactNode;
   onOpen: () => void;
-}
-
-export function GameCard({ title, description, icon, onOpen }: GameCardProps) {
+}) {
   return (
     <Card>
       <Box
@@ -58,7 +61,11 @@ export function GameCard({ title, description, icon, onOpen }: GameCardProps) {
         </Box>
 
         <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <Typography variant="h3" sx={{ fontSize: '1.4rem', lineHeight: 1.25, mb: 0.5 }}>
+          <Typography
+            variant="h3"
+            component="span"
+            sx={{ fontSize: '1.4rem', lineHeight: 1.25, mb: 0.5 }}
+          >
             {title}
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>

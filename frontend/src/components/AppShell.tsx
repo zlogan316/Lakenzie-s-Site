@@ -8,25 +8,28 @@ import { assets } from '../assets';
 const PRELOAD = [assets.hill, assets.clouds];
 
 export function AppShell() {
-  const [loading, setLoading] = useState(true);
-
   const location = useLocation();
-  const firstRender = useRef(true);
+  const isLanding = location.pathname === '/';
+
+  const [assetsReady, setAssetsReady] = useState(false);
+  const loading = isLanding && !assetsReady;
+
+  const lastPath = useRef(location.pathname);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    if (lastPath.current === location.pathname) return;
+    lastPath.current = location.pathname;
     document.getElementById('page-heading')?.focus();
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!isLanding) return;
+
     let done = false;
     const finish = () => {
       if (done) return;
       done = true;
-      setLoading(false);
+      setAssetsReady(true);
     };
 
     let remaining = PRELOAD.length;
@@ -51,7 +54,7 @@ export function AppShell() {
         img.onerror = null;
       });
     };
-  }, []);
+  }, [isLanding]);
 
   return (
     <Box
@@ -73,7 +76,11 @@ export function AppShell() {
         }}
       />
 
-      <Box component="main" sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box
+        component="main"
+        inert={loading}
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+      >
         <Outlet />
       </Box>
 

@@ -4,18 +4,11 @@ export const DEPARTURE_MS = 1100;
 
 export const REDUCED_DEPARTURE_MS = 250;
 
-const SAFETY_MS = 2000;
-
-export type DepartureState = {
-  frameIndex: number;
-  done: boolean;
-};
-
-export function departureState(
+function departureState(
   elapsedMs: number,
   frameCount: number,
-  durationMs: number = DEPARTURE_MS,
-): DepartureState {
+  durationMs: number,
+): { frameIndex: number; done: boolean } {
   const progress = durationMs <= 0 ? 1 : Math.min(1, Math.max(0, elapsedMs / durationMs));
   const frameIndex =
     frameCount <= 1 ? 0 : Math.min(frameCount - 1, Math.floor(progress * frameCount));
@@ -29,15 +22,21 @@ export function useDepartureClock(
   onDone: () => void,
 ): number {
   const [frameIndex, setFrameIndex] = useState(0);
+  const [wasActive, setWasActive] = useState(active);
+
+  if (wasActive !== active) {
+    setWasActive(active);
+    if (!active) setFrameIndex(0);
+  }
 
   const onDoneRef = useRef(onDone);
-  onDoneRef.current = onDone;
 
   useEffect(() => {
-    if (!active) {
-      setFrameIndex(0);
-      return;
-    }
+    onDoneRef.current = onDone;
+  });
+
+  useEffect(() => {
+    if (!active) return;
 
     const startedAt = performance.now();
     let frame = 0;
@@ -57,7 +56,7 @@ export function useDepartureClock(
     };
     frame = requestAnimationFrame(tick);
 
-    const fallback = window.setTimeout(finish, durationMs + SAFETY_MS);
+    const fallback = window.setTimeout(finish, durationMs + 2000);
 
     return () => {
       cancelAnimationFrame(frame);

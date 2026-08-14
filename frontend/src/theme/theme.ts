@@ -1,4 +1,3 @@
-/// <reference path="./theme.d.ts" />
 import { alpha, createTheme } from '@mui/material/styles';
 import { palette } from './palette';
 
@@ -6,7 +5,6 @@ export const fontDisplay = "'Fraunces Variable', Georgia, serif";
 export const fontBody = "'Quicksand Variable', 'Trebuchet MS', sans-serif";
 
 const softShadow = `0 6px 24px ${alpha(palette.brown, 0.1)}`;
-const softShadowLifted = `0 14px 36px ${alpha(palette.brown, 0.16)}`;
 
 export const theme = createTheme({
   palette: {
@@ -18,12 +16,6 @@ export const theme = createTheme({
       secondary: alpha(palette.brown, 0.72),
     },
     divider: alpha(palette.brown, 0.12),
-    games: {
-      correct: palette.olive,
-      present: palette.gold,
-      absent: palette.absent,
-      groups: [palette.gold, palette.olive, palette.teal, palette.coral],
-    },
   },
 
   typography: {
@@ -56,15 +48,11 @@ export const theme = createTheme({
       styleOverrides: {
         root: { backgroundImage: 'none' },
         elevation1: { boxShadow: softShadow },
-        elevation2: { boxShadow: softShadowLifted },
       },
     },
     MuiCard: {
       styleOverrides: {
-        root: {
-          boxShadow: softShadow,
-          border: `1px solid ${alpha(palette.brown, 0.08)}`,
-        },
+        root: { border: `1px solid ${alpha(palette.brown, 0.08)}` },
       },
     },
   },

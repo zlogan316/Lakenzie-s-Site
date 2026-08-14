@@ -29,10 +29,9 @@ const GAMES = [
   },
 ] as const;
 
-type GameId = (typeof GAMES)[number]['id'];
-
 export function GamesPage() {
-  const [openId, setOpenId] = useState<GameId | null>(null);
+  const [selected, setSelected] = useState<(typeof GAMES)[number] | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <Box
@@ -60,6 +59,7 @@ export function GamesPage() {
       <Box
         sx={{
           width: '80%',
+          maxWidth: '65ch',
           display: 'flex',
           flexDirection: 'column',
           gap: { xs: 2, sm: 2.5 },
@@ -71,27 +71,28 @@ export function GamesPage() {
             title={game.title}
             description={game.description}
             icon={game.icon}
-            onOpen={() => setOpenId(game.id)}
+            onOpen={() => {
+              setSelected(game);
+              setDialogOpen(true);
+            }}
           />
         ))}
       </Box>
 
-      {GAMES.map((game) => (
-        <Dialog
-          key={game.id}
-          open={openId === game.id}
-          onClose={() => setOpenId(null)}
-          fullWidth
-          maxWidth="sm"
-        >
-          <DialogTitle>{game.title}</DialogTitle>
-          <DialogContent>
-            <Typography sx={{ color: 'text.secondary' }}>
-              Coming soon — {game.title} will live here.
-            </Typography>
-          </DialogContent>
-        </Dialog>
-      ))}
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="game-dialog-title"
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle id="game-dialog-title">{selected?.title}</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'text.secondary' }}>
+            Coming soon — {selected?.title} will live here.
+          </Typography>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

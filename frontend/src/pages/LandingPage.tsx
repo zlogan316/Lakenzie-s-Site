@@ -2,6 +2,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { palette } from '../theme/palette';
 import { assets, cssUrl } from '../assets';
@@ -16,9 +17,6 @@ import {
 
 const CLOUD_TILES_PER_REEL = 16;
 
-const RIBBON_TOP_PCT = -7;
-const RIBBON_HEIGHT_PCT = 40;
-
 const CLOUD_BAND_TOP_PCT = { xs: 5, sm: -4 };
 const CLOUD_BAND_HEIGHT_PCT = { xs: 38, sm: 60 };
 const CLOUD_ART_BOTTOM = 0.6;
@@ -32,7 +30,25 @@ const CARD_TOP_PCT = {
   xs: cardTopPct(CLOUD_BAND_TOP_PCT.xs, CLOUD_BAND_HEIGHT_PCT.xs),
   sm: cardTopPct(CLOUD_BAND_TOP_PCT.sm, CLOUD_BAND_HEIGHT_PCT.sm),
 };
-const CARD_BOTTOM_PCT = { xs: 1.5, sm: 2 };
+const CARD_COPY = `What does it mean to be weird? Is it a way to describe someone wearing funny clothes and honking a horn? Maybe something you would use to describe a thingamajig, doohickey or whatchamacallit? Or maybe the word is so untamed that you can't pin it down to one definition. I would say that my own personal meaning doesn't fit into any of those bins! Instead, weird is a way of being, something that makes a person stand out in a crowd or the perfect find stand out in a thrift store! It's a word that's unique and full of quirk! And if you've ever been described with it, you might have the same diagnosis... but that's not a bad thing (or at the least, doesn't have to be). You have to harness your weirdness, not for clout or attention but instead for things you're passionate about. Soon you might make a difference, and no matter how small it might seem to others, the true difference is the one you make to yourself.`;
+
+const CARD_COPY_SX = {
+  color: palette.brown,
+  lineHeight: { xs: 1.4, sm: 1.6 },
+  fontWeight: 500,
+  textAlign: 'center',
+  fontSize: { xs: '5cqw', sm: '3.8cqw', md: '2.6cqw', lg: '2.1cqw', xl: '1.9cqw' },
+} as const;
+
+const CARD_PEEK = (
+  <Typography sx={CARD_COPY_SX}>
+    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+      Soon you might make a difference, and{' '}
+    </Box>
+    no matter how small it might seem to others, the true difference is the one you make to
+    yourself.
+  </Typography>
+);
 
 const DANDELIONS = [
   { to: '/games', label: 'Games', left: { xs: '8%', sm: '11%', md: '12%' }, mirrored: false },
@@ -52,13 +68,11 @@ const CLOUD_BAND_SX = {
   pointerEvents: 'none',
 } as const;
 
-const DRIFT_STEPS = 9000;
-
 const CLOUD_TRACK_SX = {
   display: 'flex',
   height: '100%',
   width: 'max-content',
-  animation: `cloudDrift 600s steps(${DRIFT_STEPS}) infinite`,
+  animation: 'cloudDrift 600s steps(9000) infinite',
   '@keyframes cloudDrift': {
     from: { transform: 'translateX(-50%)' },
     to: { transform: 'translateX(0)' },
@@ -119,9 +133,9 @@ export function LandingPage() {
 
     const start = () => {
       framesWarmed = true;
-      warmedFrames.current = assets.dandelionFrames.slice(1).map((frame) => {
+      warmedFrames.current = assets.dandelionFrames.slice(1).map((src) => {
         const img = new Image();
-        img.src = frame.src;
+        img.src = src;
         void img.decode().catch(() => {});
         return img;
       });
@@ -156,7 +170,8 @@ export function LandingPage() {
           left: 0,
           right: 0,
           bottom: { xs: '-3.85%', sm: -50 },
-          height: '100%',
+          height: { xs: '100%', sm: 'auto' },
+          aspectRatio: { sm: '1123 / 794' },
           zIndex: 0,
           pointerEvents: 'none',
           backgroundImage: cssUrl(assets.hill),
@@ -174,11 +189,10 @@ export function LandingPage() {
           position: 'relative',
           zIndex: 1,
           flex: 1,
-          pt: { xs: 6, md: 9 },
-          pb: { xs: 3, md: 4 },
+          pt: 6,
+          pb: 3,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
         }}
       >
         <Box
@@ -191,8 +205,8 @@ export function LandingPage() {
             position: { sm: 'absolute' },
             left: { sm: 0 },
             right: { sm: 0 },
-            top: { sm: `${RIBBON_TOP_PCT}%` },
-            height: { sm: `${RIBBON_HEIGHT_PCT}%` },
+            top: { sm: '-7%' },
+            height: { sm: '40%' },
             justifyContent: { sm: 'center' },
           }}
         >
@@ -215,14 +229,16 @@ export function LandingPage() {
           sx={{
             position: 'absolute',
             top: { xs: `${CARD_TOP_PCT.xs}%`, sm: `${CARD_TOP_PCT.sm}%` },
-            bottom: { xs: `${CARD_BOTTOM_PCT.xs}%`, sm: `${CARD_BOTTOM_PCT.sm}%` },
-            left: '10%',
-            right: '10%',
+            bottom: { xs: '1.5%', sm: '2%' },
+            left: { xs: '7%', sm: '10%' },
+            right: { xs: '7%', sm: '10%' },
             display: 'flex',
             justifyContent: 'center',
           }}
         >
-          <DrawstringCard sx={{ height: '100%' }} />
+          <DrawstringCard sx={{ height: '100%' }} peek={CARD_PEEK}>
+            <Typography sx={CARD_COPY_SX}>{CARD_COPY}</Typography>
+          </DrawstringCard>
         </Box>
         {DANDELIONS.map((d) => {
           const isDeparting = departingTo === d.to;

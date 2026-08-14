@@ -2,11 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import { palette } from '../theme/palette';
-import { fontDisplay } from '../theme/theme';
-
-interface RibbonBannerProps {
-  title: string;
-}
 
 const VB_W = 600;
 const VB_H_STRIP = 90;
@@ -74,7 +69,7 @@ const STRIP_MID = (STRIP.top + STRIP.bottom) / 2;
 const RIBBON_MID = (RIBBON.bandTop + RIBBON.bandBottom) / 2;
 
 const STRIP_FONT = (STRIP.bottom - STRIP.top) * 0.62;
-const RIBBON_FONT = (RIBBON.bandBottom - RIBBON.bandTop) * 0.6;
+const RIBBON_FONT = (RIBBON.bandBottom - RIBBON.bandTop) * 0.73;
 
 const pct = (n: number, total: number) => `${(n / total) * 100}%`;
 const cqw = (n: number) => `${(n / VB_W) * 100}cqw`;
@@ -88,9 +83,8 @@ const titleSx = {
   right: 0,
   transform: 'translateY(-50%)',
   textAlign: 'center',
-  fontFamily: fontDisplay,
-  fontWeight: 560,
-  letterSpacing: '-0.015em',
+  fontFamily: "'Lilita One', cursive",
+  fontWeight: 400,
   lineHeight: 1,
   color: palette.gold,
   pointerEvents: 'none',
@@ -98,14 +92,14 @@ const titleSx = {
 
 const visuallyHidden = {
   position: 'absolute',
-  width: 1,
-  height: 1,
+  width: '1px',
+  height: '1px',
   overflow: 'hidden',
   clip: 'rect(0 0 0 0)',
   whiteSpace: 'nowrap',
 } as const;
 
-export function RibbonBanner({ title }: RibbonBannerProps) {
+export function RibbonBanner({ title }: { title: string }) {
   return (
     <Box
       sx={{
@@ -115,7 +109,7 @@ export function RibbonBanner({ title }: RibbonBannerProps) {
         filter: `drop-shadow(0 8px 18px ${alpha(palette.brown, 0.18)})`,
       }}
     >
-      <Typography component="h1" sx={visuallyHidden}>
+      <Typography id="page-heading" tabIndex={-1} component="h1" sx={visuallyHidden}>
         {title}
       </Typography>
 
