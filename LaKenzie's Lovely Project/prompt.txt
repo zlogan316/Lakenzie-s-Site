@@ -1,0 +1,9 @@
+I want to make a website for my gf, 
+- LaKenzie website personal project
+      BACKEND: Python
+      FRONTEND: Typescript/javascript or react/node depending on whats better.
+It should connect to a sql server don't worry about the exact connection for now since I'll need to set that up later. 
+
+I mainly want it to be a cute site for her that I can also put some new york times esque word games on there with a track on words/puzzles that have already been solved/attempted so that she never sees the same one twice. Also I'd like to do it in python and react most likely. don't worry a ton about the actual layout of the pages on the site for now it just needs to have a landing page. Also I've uploaded the color pallete of the site. I need you to also make sure you utilize mui components for a fresh feel.
+
+Plan out the implementation first and debate on whether or not it would be better to use different languages for the frontend. 
