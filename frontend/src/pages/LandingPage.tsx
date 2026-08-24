@@ -56,6 +56,14 @@ const DANDELIONS = [
 ] as const;
 
 let framesWarmed = false;
+const loadedFrameSrcs = new Set<string>([assets.dandelionFrames[0]]);
+
+const newestLoadedFrame = (frames: readonly string[], upTo: number) => {
+  for (let i = upTo; i > 0; i -= 1) {
+    if (loadedFrameSrcs.has(frames[i])) return frames[i];
+  }
+  return frames[0];
+};
 
 const CLOUD_BAND_SX = {
   position: 'absolute',
@@ -135,6 +143,9 @@ export function LandingPage() {
       framesWarmed = true;
       warmedFrames.current = assets.dandelionFrames.slice(1).map((src) => {
         const img = new Image();
+        img.onload = () => {
+          loadedFrameSrcs.add(src);
+        };
         img.src = src;
         void img.decode().catch(() => {});
         return img;
@@ -245,7 +256,7 @@ export function LandingPage() {
           return (
             <DandelionLink
               key={d.to}
-              frame={isDeparting ? frames[frameIndex] : frames[0]}
+              frame={isDeparting ? newestLoadedFrame(frames, frameIndex) : frames[0]}
               label={d.label}
               to={d.to}
               left={d.left}

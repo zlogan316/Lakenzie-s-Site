@@ -69,11 +69,13 @@ export function DandelionLink({
         zIndex: departing ? 2 : 0,
         '&:focus-visible .dandelion-label': { opacity: 1 },
         '&:active .dandelion-frame, &:focus-visible .dandelion-frame': HIGHLIGHT_SCALE,
-        '&:active .dandelion-glow, &:focus-visible .dandelion-glow': HIGHLIGHT_GLOW,
+        ...(!departing && {
+          '&:active .dandelion-glow, &:focus-visible .dandelion-glow': HIGHLIGHT_GLOW,
+        }),
         '@media (hover: hover)': {
           '&:hover .dandelion-label': { opacity: 1 },
           '&:hover .dandelion-frame': HIGHLIGHT_SCALE,
-          '&:hover .dandelion-glow': HIGHLIGHT_GLOW,
+          ...(!departing && { '&:hover .dandelion-glow': HIGHLIGHT_GLOW }),
         },
         '&:focus-visible': {
           outline: `2px solid ${palette.gold}`,
@@ -115,7 +117,6 @@ export function DandelionLink({
           height: `${WINDOW_HEIGHT_FLOWER_HEIGHTS * 100}%`,
           overflow: departing ? 'visible' : 'hidden',
           transition: 'filter 200ms ease',
-          ...(departing && HIGHLIGHT_GLOW),
           pointerEvents: 'none',
         }}
       >

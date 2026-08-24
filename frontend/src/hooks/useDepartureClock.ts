@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-export const DEPARTURE_MS = 1100;
+export const DEPARTURE_MS = 950;
 
 export const REDUCED_DEPARTURE_MS = 250;
+
+const DEPARTURE_EASE = 0.6;
 
 function departureState(
   elapsedMs: number,
@@ -11,7 +13,9 @@ function departureState(
 ): { frameIndex: number; done: boolean } {
   const progress = durationMs <= 0 ? 1 : Math.min(1, Math.max(0, elapsedMs / durationMs));
   const frameIndex =
-    frameCount <= 1 ? 0 : Math.min(frameCount - 1, Math.floor(progress * frameCount));
+    frameCount <= 1
+      ? 0
+      : Math.min(frameCount - 1, Math.floor(progress ** DEPARTURE_EASE * frameCount));
   return { frameIndex, done: progress >= 1 };
 }
 
