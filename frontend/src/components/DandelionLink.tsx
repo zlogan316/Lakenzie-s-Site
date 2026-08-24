@@ -10,21 +10,22 @@ const STEM_ANCHOR_Y = 0.877;
 const FLOWER_WIDTH_MM = 27.675169;
 const FLOWER_HEIGHT_MM = 65.392;
 
-const HIGHLIGHT_FRAME = {
+const HIGHLIGHT_GLOW = {
   filter: `drop-shadow(0 0 0.4em ${palette.goldSoft})`,
+};
+
+const HIGHLIGHT_SCALE = {
   scale: '1.04',
 };
 
 const LABEL_SIDE_PCT = 125;
 
-const FLOWER_W_FRAC = FLOWER_WIDTH_MM / DANDELION_PAGE_MM;
 const FLOWER_H_FRAC = FLOWER_HEIGHT_MM / (DANDELION_PAGE_MM * (1512 / 1890));
 
-const CLIP_SIDE_FLOWER_WIDTHS = 1.5;
-
-const clipLeftPct = (DANDELION_STEM_X - FLOWER_W_FRAC * CLIP_SIDE_FLOWER_WIDTHS) * 100;
-const clipRightPct = (1 - DANDELION_STEM_X - FLOWER_W_FRAC * CLIP_SIDE_FLOWER_WIDTHS) * 100;
-const clipTopPct = (STEM_ANCHOR_Y - FLOWER_H_FRAC * 2) * 100;
+const WINDOW_SIDE_FLOWER_WIDTHS = 1.5;
+const WINDOW_UP_FLOWER_HEIGHTS = 2;
+const WINDOW_BELOW_STEM_FLOWER_HEIGHTS = (1 - STEM_ANCHOR_Y) / FLOWER_H_FRAC;
+const WINDOW_HEIGHT_FLOWER_HEIGHTS = WINDOW_UP_FLOWER_HEIGHTS + WINDOW_BELOW_STEM_FLOWER_HEIGHTS;
 
 export function DandelionLink({
   frame,
@@ -67,10 +68,12 @@ export function DandelionLink({
         overflow: 'visible',
         zIndex: departing ? 2 : 0,
         '&:focus-visible .dandelion-label': { opacity: 1 },
-        '&:active .dandelion-frame, &:focus-visible .dandelion-frame': HIGHLIGHT_FRAME,
+        '&:active .dandelion-frame, &:focus-visible .dandelion-frame': HIGHLIGHT_SCALE,
+        '&:active .dandelion-glow, &:focus-visible .dandelion-glow': HIGHLIGHT_GLOW,
         '@media (hover: hover)': {
           '&:hover .dandelion-label': { opacity: 1 },
-          '&:hover .dandelion-frame': HIGHLIGHT_FRAME,
+          '&:hover .dandelion-frame': HIGHLIGHT_SCALE,
+          '&:hover .dandelion-glow': HIGHLIGHT_GLOW,
         },
         '&:focus-visible': {
           outline: `2px solid ${palette.gold}`,
@@ -103,28 +106,46 @@ export function DandelionLink({
       </Typography>
 
       <Box
-        className="dandelion-frame"
-        component="img"
-        src={frame}
-        alt=""
-        draggable={false}
+        className="dandelion-glow"
         sx={{
           position: 'absolute',
-          left: '50%',
-          top: '100%',
-          width: `${100 * (DANDELION_PAGE_MM / FLOWER_WIDTH_MM)}%`,
-          transformOrigin: `${DANDELION_STEM_X * 100}% ${STEM_ANCHOR_Y * 100}%`,
-          transform:
-            `translate(${-100 * DANDELION_STEM_X}%, ${-100 * STEM_ANCHOR_Y}%)` +
-            (mirrored ? ' scaleX(-1)' : ''),
-          transition: 'filter 200ms ease, scale 200ms ease',
-          ...(departing && HIGHLIGHT_FRAME),
-          clipPath: departing
-            ? 'none'
-            : `inset(${clipTopPct}% ${clipRightPct}% 0% ${clipLeftPct}%)`,
+          left: `${(0.5 - WINDOW_SIDE_FLOWER_WIDTHS) * 100}%`,
+          top: `${(1 - WINDOW_UP_FLOWER_HEIGHTS) * 100}%`,
+          width: `${WINDOW_SIDE_FLOWER_WIDTHS * 2 * 100}%`,
+          height: `${WINDOW_HEIGHT_FLOWER_HEIGHTS * 100}%`,
+          overflow: departing ? 'visible' : 'hidden',
+          transition: 'filter 200ms ease',
+          ...(departing && HIGHLIGHT_GLOW),
           pointerEvents: 'none',
         }}
-      />
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            transform: mirrored ? 'scaleX(-1)' : 'none',
+          }}
+        >
+          <Box
+            className="dandelion-frame"
+            component="img"
+            src={frame}
+            alt=""
+            draggable={false}
+            sx={{
+              position: 'absolute',
+              left: '50%',
+              top: `${(WINDOW_UP_FLOWER_HEIGHTS / WINDOW_HEIGHT_FLOWER_HEIGHTS) * 100}%`,
+              width: `${(100 * (DANDELION_PAGE_MM / FLOWER_WIDTH_MM)) / (2 * WINDOW_SIDE_FLOWER_WIDTHS)}%`,
+              transformOrigin: `${DANDELION_STEM_X * 100}% ${STEM_ANCHOR_Y * 100}%`,
+              transform: `translate(${-100 * DANDELION_STEM_X}%, ${-100 * STEM_ANCHOR_Y}%)`,
+              transition: 'scale 200ms ease',
+              ...(departing && HIGHLIGHT_SCALE),
+              pointerEvents: 'none',
+            }}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 }

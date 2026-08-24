@@ -4,12 +4,13 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { palette } from '../theme/palette';
 import { assets } from '../assets';
+import { comingSoon } from '../comingSoon';
 
 const PRELOAD = [assets.hill, assets.clouds];
 
 export function AppShell() {
   const location = useLocation();
-  const isLanding = location.pathname === '/';
+  const isLanding = location.pathname === '/' && !comingSoon.landing;
 
   const [assetsReady, setAssetsReady] = useState(false);
   const loading = isLanding && !assetsReady;
