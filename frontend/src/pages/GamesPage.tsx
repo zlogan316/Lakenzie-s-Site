@@ -58,8 +58,7 @@ export function GamesPage() {
 
       <Box
         sx={{
-          width: '80%',
-          maxWidth: '65ch',
+          width: { xs: '80%', md: '60%' },
           display: 'flex',
           flexDirection: 'column',
           gap: { xs: 2, sm: 2.5 },

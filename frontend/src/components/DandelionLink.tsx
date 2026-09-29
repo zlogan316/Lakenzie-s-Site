@@ -3,20 +3,13 @@ import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { palette } from '../theme/palette';
+import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
 import { DANDELION_PAGE_MM, DANDELION_STEM_X } from '../assets';
 
 const STEM_ANCHOR_Y = 0.877;
 
 const FLOWER_WIDTH_MM = 27.675169;
 const FLOWER_HEIGHT_MM = 65.392;
-
-const HIGHLIGHT_GLOW = {
-  filter: `drop-shadow(0 0 0.4em ${palette.goldSoft})`,
-};
-
-const HIGHLIGHT_SCALE = {
-  scale: '1.04',
-};
 
 const LABEL_SIDE_PCT = 125;
 

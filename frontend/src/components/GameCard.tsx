@@ -4,6 +4,9 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import { palette } from '../theme/palette';
+import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
+
+const HIGHLIGHT = { ...HIGHLIGHT_SCALE, ...HIGHLIGHT_GLOW };
 
 export function GameCard({
   title,
@@ -17,7 +20,13 @@ export function GameCard({
   onOpen: () => void;
 }) {
   return (
-    <Card>
+    <Card
+      sx={{
+        transition: 'scale 200ms ease, filter 200ms ease',
+        '&:active, &:has(:focus-visible)': HIGHLIGHT,
+        '@media (hover: hover)': { '&:hover': HIGHLIGHT },
+      }}
+    >
       <Box
         component="button"
         type="button"
