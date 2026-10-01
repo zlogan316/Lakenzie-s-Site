@@ -6,7 +6,7 @@ import { palette } from '../theme/palette';
 import { assets } from '../assets';
 import { comingSoon } from '../comingSoon';
 
-const PRELOAD = [assets.hill, assets.clouds];
+const PRELOAD = [assets.hill, assets.clouds, assets.banner];
 
 export function AppShell() {
   const location = useLocation();

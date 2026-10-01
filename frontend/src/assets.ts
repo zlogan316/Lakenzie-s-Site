@@ -1,4 +1,5 @@
 export const assets = {
+  banner: '/banner.png',
   clouds: '/clouds.svg',
   dandelionFrames: [
     '/Dandelion1.png',

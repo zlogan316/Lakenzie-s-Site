@@ -223,10 +223,10 @@ export function LandingPage() {
         >
           <Box
             sx={{
-              width: { xs: '100%', sm: 'auto' },
-              height: { sm: '100%' },
+              width: { xs: '80%', sm: 'auto' },
+              height: { sm: '80%' },
               aspectRatio: { sm: RIBBON_ASPECT },
-              maxWidth: { sm: '80%' },
+              maxWidth: { sm: '64%' },
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',

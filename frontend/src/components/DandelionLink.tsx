@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { keyframes } from '@mui/material/styles';
 import { palette } from '../theme/palette';
 import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
 import { DANDELION_PAGE_MM, DANDELION_STEM_X } from '../assets';
@@ -19,6 +20,29 @@ const WINDOW_SIDE_FLOWER_WIDTHS = 1.5;
 const WINDOW_UP_FLOWER_HEIGHTS = 2;
 const WINDOW_BELOW_STEM_FLOWER_HEIGHTS = (1 - STEM_ANCHOR_Y) / FLOWER_H_FRAC;
 const WINDOW_HEIGHT_FLOWER_HEIGHTS = WINDOW_UP_FLOWER_HEIGHTS + WINDOW_BELOW_STEM_FLOWER_HEIGHTS;
+const WINDOW_STEM_Y_PCT = (WINDOW_UP_FLOWER_HEIGHTS / WINDOW_HEIGHT_FLOWER_HEIGHTS) * 100;
+
+const NUDGE_PERIOD_MS = 8000;
+const NUDGE_SWING_MS = 160;
+const NUDGE_SWINGS_DEG = [3, -2.5, 1.75, -1, 0];
+const NUDGE_START_MS = NUDGE_PERIOD_MS - NUDGE_SWING_MS * NUDGE_SWINGS_DEG.length;
+
+const nudgeAt = (ms: number) => `${Number(((ms / NUDGE_PERIOD_MS) * 100).toFixed(4))}%`;
+
+const nudgeKeyframes = (sign: number) =>
+  keyframes({
+    '0%': { rotate: '0deg' },
+    [nudgeAt(NUDGE_START_MS)]: { rotate: '0deg' },
+    ...Object.fromEntries(
+      NUDGE_SWINGS_DEG.map((deg, i) => [
+        nudgeAt(NUDGE_START_MS + NUDGE_SWING_MS * (i + 1)),
+        { rotate: `${sign * deg}deg` },
+      ]),
+    ),
+  });
+
+const NUDGE = nudgeKeyframes(1);
+const NUDGE_MIRRORED = nudgeKeyframes(-1);
 
 export function DandelionLink({
   frame,
@@ -62,12 +86,14 @@ export function DandelionLink({
         zIndex: departing ? 2 : 0,
         '&:focus-visible .dandelion-label': { opacity: 1 },
         '&:active .dandelion-frame, &:focus-visible .dandelion-frame': HIGHLIGHT_SCALE,
+        '&:active .dandelion-nudge, &:focus-visible .dandelion-nudge': { rotate: '0deg !important' },
         ...(!departing && {
           '&:active .dandelion-glow, &:focus-visible .dandelion-glow': HIGHLIGHT_GLOW,
         }),
         '@media (hover: hover)': {
           '&:hover .dandelion-label': { opacity: 1 },
           '&:hover .dandelion-frame': HIGHLIGHT_SCALE,
+          '&:hover .dandelion-nudge': { rotate: '0deg !important' },
           ...(!departing && { '&:hover .dandelion-glow': HIGHLIGHT_GLOW }),
         },
         '&:focus-visible': {
@@ -114,10 +140,16 @@ export function DandelionLink({
         }}
       >
         <Box
+          className="dandelion-nudge"
           sx={{
             position: 'absolute',
             inset: 0,
             transform: mirrored ? 'scaleX(-1)' : 'none',
+            transformOrigin: `50% ${WINDOW_STEM_Y_PCT}%`,
+            animation: departing
+              ? 'none'
+              : `${mirrored ? NUDGE_MIRRORED : NUDGE} ${NUDGE_PERIOD_MS}ms ease-in-out infinite`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
           <Box
@@ -129,7 +161,7 @@ export function DandelionLink({
             sx={{
               position: 'absolute',
               left: '50%',
-              top: `${(WINDOW_UP_FLOWER_HEIGHTS / WINDOW_HEIGHT_FLOWER_HEIGHTS) * 100}%`,
+              top: `${WINDOW_STEM_Y_PCT}%`,
               width: `${(100 * (DANDELION_PAGE_MM / FLOWER_WIDTH_MM)) / (2 * WINDOW_SIDE_FLOWER_WIDTHS)}%`,
               transformOrigin: `${DANDELION_STEM_X * 100}% ${STEM_ANCHOR_Y * 100}%`,
               transform: `translate(${-100 * DANDELION_STEM_X}%, ${-100 * STEM_ANCHOR_Y}%)`,

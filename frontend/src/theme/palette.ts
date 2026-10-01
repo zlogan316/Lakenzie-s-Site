@@ -19,4 +19,5 @@ export const palette = {
   coralSoft: '#E98E8A',
   brownSoft: '#8A6E4F',
   creamDeep: '#F3E6CD',
+  brownDeep: '#3A2917',
 } as const;

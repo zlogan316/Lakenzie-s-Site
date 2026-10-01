@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { AnimationEvent, ReactNode } from 'react';
+import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha, keyframes } from '@mui/material/styles';
+import { createSvgIcon } from '@mui/material/utils';
 import { palette } from '../theme/palette';
-import { HIGHLIGHT_SCALE } from '../theme/highlight';
+import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
 import { assets, cssUrl } from '../assets';
 
 type Side = 'left' | 'right';
@@ -16,10 +18,33 @@ const opposite = (side: Side): Side => (side === 'left' ? 'right' : 'left');
 
 const SIGN: Record<Side, number> = { left: 1, right: -1 };
 
+const ArrowBackRoundedIcon = createSvgIcon(
+  <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" />,
+  'ArrowBackRounded',
+);
+
+const InstagramIcon = createSvgIcon(
+  <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />,
+  'Instagram',
+);
+
+const TikTokIcon = createSvgIcon(
+  <path
+    transform="translate(2 2) scale(0.8333)"
+    d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+  />,
+  'TikTok',
+);
+
+const YouTubeIcon = createSvgIcon(
+  <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z" />,
+  'YouTube',
+);
+
 const SOCIALS = [
-  { label: 'Instagram', href: 'https://www.instagram.com/_lakenzo_/' },
-  { label: 'TikTok', href: 'https://www.tiktok.com/@_lakenzo_' },
-  { label: 'YouTube', href: 'https://www.youtube.com/@LaKenzo' },
+  { label: 'Instagram', href: 'https://www.instagram.com/_lakenzo_/', Icon: InstagramIcon },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@_lakenzo_', Icon: TikTokIcon },
+  { label: 'YouTube', href: 'https://www.youtube.com/@LaKenzo', Icon: YouTubeIcon },
 ] as const;
 
 const ABOUT_ME = {
@@ -401,19 +426,59 @@ const STAGE_SX = {
   },
 } as const;
 
+const HIGHLIGHT = { ...HIGHLIGHT_SCALE, ...HIGHLIGHT_GLOW };
+
+const BACK_LINK_SX = {
+  position: 'absolute',
+  top: '0.75em',
+  left: '0.75em',
+  zIndex: 2,
+  display: 'flex',
+  p: '0.3em',
+  borderRadius: '50%',
+  fontSize: 'var(--type)',
+  color: palette.goldSoft,
+  stroke: palette.brown,
+  strokeWidth: 2,
+  strokeLinejoin: 'round',
+  paintOrder: 'stroke',
+  filter: `drop-shadow(0 0.1em 0.15em ${alpha(palette.navy, 0.45)})`,
+  transition: 'scale 200ms ease, filter 200ms ease',
+  WebkitTapHighlightColor: 'transparent',
+  '&:active, &:focus-visible': HIGHLIGHT,
+  '@media (hover: hover)': { '&:hover': HIGHLIGHT },
+  '&:focus-visible': { outline: `2px solid ${palette.gold}`, outlineOffset: '0.1em' },
+} as const;
+
+const CARD_SX = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '0.9em',
+  width: '100%',
+  maxWidth: '34em',
+  boxSizing: 'border-box',
+  overflowY: 'auto',
+  px: '1.6em',
+  py: '1.4em',
+  color: palette.brown,
+  bgcolor: palette.oliveSoft,
+  border: `0.3em solid ${palette.olive}`,
+  borderRadius: '1.5em',
+  boxShadow: `0 0.6em 1.6em ${alpha(palette.navy, 0.4)}`,
+} as const;
+
 const TITLE_SX = {
   fontFamily: TITLE_FONT,
   fontWeight: 400,
   fontSize: '2em',
   lineHeight: 1.1,
-  color: palette.goldSoft,
 } as const;
 
 const BODY_SX = {
   fontSize: '1em',
   lineHeight: 1.55,
   fontWeight: 500,
-  color: alpha(palette.goldSoft, 0.85),
   maxWidth: '30em',
 } as const;
 
@@ -428,20 +493,19 @@ const SOCIAL_LINK_SX = {
   display: 'inline-flex',
   alignItems: 'center',
   gap: '0.45em',
-  px: '1em',
-  py: '0.6em',
+  px: '1.1em',
+  py: '0.7em',
   borderRadius: '999em',
   fontSize: '1em',
   fontWeight: 700,
   textDecoration: 'none',
-  color: palette.brown,
-  bgcolor: palette.paper,
-  border: `1px solid ${alpha(palette.brown, 0.14)}`,
-  boxShadow: `0 0.25em 0.9em ${alpha(palette.brown, 0.08)}`,
+  color: palette.brownDeep,
+  bgcolor: palette.goldSoft,
+  boxShadow: `inset 0 0 0 0.1em ${palette.brown}, 0 0.25em 0.9em ${alpha(palette.brown, 0.08)}`,
   transition: 'scale 200ms ease',
   WebkitTapHighlightColor: 'transparent',
-  '&:active': { bgcolor: palette.creamDeep, ...HIGHLIGHT_SCALE },
-  '@media (hover: hover)': { '&:hover': { bgcolor: palette.creamDeep, ...HIGHLIGHT_SCALE } },
+  '&:active': { bgcolor: palette.gold, ...HIGHLIGHT_SCALE },
+  '@media (hover: hover)': { '&:hover': { bgcolor: palette.gold, ...HIGHLIGHT_SCALE } },
   '&:focus-visible': { outline: `2px solid ${palette.brown}`, outlineOffset: '0.2em' },
 } as const;
 
@@ -692,7 +756,6 @@ function SectionContent({
         gap: '0.9em',
         textAlign: 'center',
         fontSize: 'var(--type)',
-        color: palette.goldSoft,
         [LANDSCAPE]: {
           top: `${CONTENT_TOP_CQH.landscape}cqh`,
           bottom: `${CONTENT_TOP_CQH.landscape}cqh`,
@@ -701,34 +764,15 @@ function SectionContent({
         },
       }}
     >
-      <Typography id={headingId} component="h2" sx={TITLE_SX}>
-        {title}
-      </Typography>
-      {children}
+      <Box sx={CARD_SX}>
+        <Typography id={headingId} component="h2" sx={TITLE_SX}>
+          {title}
+        </Typography>
+        {children}
+      </Box>
       <Typography aria-hidden sx={HINT_SX}>
         Poke Ziggy to hop to {nextTitle}
       </Typography>
-    </Box>
-  );
-}
-
-function ExternalIcon() {
-  return (
-    <Box
-      component="svg"
-      viewBox="0 0 24 24"
-      aria-hidden
-      focusable="false"
-      sx={{ width: '1em', height: '1em', flexShrink: 0, color: palette.olive }}
-    >
-      <path
-        d="M8 16 16 8M10 8h6v6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
     </Box>
   );
 }
@@ -773,8 +817,8 @@ function SocialLinks() {
             rel="noopener noreferrer"
             sx={SOCIAL_LINK_SX}
           >
+            <social.Icon sx={{ fontSize: '1.3em' }} />
             {social.label}
-            <ExternalIcon />
             <Box component="span" sx={VISUALLY_HIDDEN}>
               (opens in a new tab)
             </Box>
@@ -846,7 +890,6 @@ function DandelionCount({ shown }: { shown: boolean }) {
           fontSize: '4.6em',
           lineHeight: 1,
           fontVariantNumeric: 'tabular-nums',
-          color: palette.olive,
         }}
       >
         {counted ? DANDELION_COUNT.toLocaleString() : <span aria-hidden>—</span>}
@@ -900,6 +943,10 @@ export function FunFactsPage() {
       <Typography id="page-heading" tabIndex={-1} component="h1" sx={VISUALLY_HIDDEN}>
         Fun Facts
       </Typography>
+
+      <Box component={Link} to="/" aria-label="Back to home" sx={BACK_LINK_SX}>
+        <ArrowBackRoundedIcon sx={{ fontSize: '2.4em' }} />
+      </Box>
 
       <Ziggy
         side={side}

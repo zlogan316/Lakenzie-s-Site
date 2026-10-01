@@ -9,6 +9,9 @@
    id="svg1"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    sodipodi:docname="cloud.svg"
+   inkscape:export-filename="cloud.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,15 +27,24 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      inkscape:zoom="0.77074639"
-     inkscape:cx="561.14437"
-     inkscape:cy="59.033685"
+     inkscape:cx="539.73655"
+     inkscape:cy="125.20331"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
-     showguides="true" />
+     showguides="true">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="297"
+       height="210"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
   <defs
      id="defs1">
     <inkscape:path-effect
@@ -52,9 +64,9 @@
      id="layer1">
     <path
        style="fill:#ffffff;stroke:#000000;stroke-width:0.0499999"
-       d="m 146.40472,89.156705 c 19.22955,-8.09665 29.81041,2.85223 29.81041,2.85223 0,0 10.02881,-14.99721 25.67007,-11.31691 15.64126,3.6803 10.30483,17.75743 10.30483,17.75743 0,0 -4.14033,27.510235 -25.76208,20.333655 0,0 -12.78903,9.20074 -26.59014,0.73606 -13.80112,-8.46469 -4.32435,-13.06506 -4.32435,-13.06506 0,0 -19.6896,-4.78439 -9.10874,-17.297405 z"
+       d="m 146.40472,89.156705 c 19.22955,-8.09665 29.81041,2.85223 29.81041,2.85223 0,0 10.02881,-14.99721 25.67007,-11.31691 15.64126,3.6803 10.30483,17.75743 10.30483,17.75743 0,0 9.46716,-2.719967 14.59165,6.718045 7.52833,13.86527 -9.81968,11.04546 -12.41307,13.43474 -6.39824,5.89468 -17.12979,3.76916 -27.94066,0.18087 0,0 -12.78903,9.20074 -26.59014,0.73606 -13.80112,-8.46469 -4.32435,-13.06506 -4.32435,-13.06506 0,0 -19.6896,-4.78439 -9.10874,-17.297405 z"
        id="path1"
-       sodipodi:nodetypes="ccscc"
+       sodipodi:nodetypes="ccscsscscc"
        inkscape:export-filename="cloud.svg"
        inkscape:export-xdpi="95.673332"
        inkscape:export-ydpi="95.673332" />
