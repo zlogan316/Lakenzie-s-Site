@@ -1,4 +1,6 @@
+import Box from '@mui/material/Box';
 import { palette } from '../theme/palette';
+import { assets } from '../assets';
 
 
 const svgProps = {
@@ -11,41 +13,53 @@ const svgProps = {
 
 export function WordGuessIcon() {
   return (
-    <svg {...svgProps}>
-      <rect x="1.5" y="1.5" width="9.5" height="9.5" rx="2" fill={palette.olive} />
-      <rect x="13" y="1.5" width="9.5" height="9.5" rx="2" fill={palette.gold} />
-      <rect x="1.5" y="13" width="9.5" height="9.5" rx="2" fill={palette.absent} />
-      <rect x="13" y="13" width="9.5" height="9.5" rx="2" fill={palette.goldSoft} />
-    </svg>
+    <Box
+      component="img"
+      src={assets.dandelionBloom}
+      alt=""
+      draggable={false}
+      sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
+    />
   );
 }
 
-export function RelationsIcon() {
+export function DictionaryMatchIcon() {
   return (
     <svg {...svgProps}>
-      <rect x="2" y="2" width="20" height="3.8" rx="1.9" fill={palette.gold} />
-      <rect x="2" y="7.4" width="20" height="3.8" rx="1.9" fill={palette.olive} />
-      <rect x="2" y="12.8" width="20" height="3.8" rx="1.9" fill={palette.teal} />
-      <rect x="2" y="18.2" width="20" height="3.8" rx="1.9" fill={palette.coral} />
-    </svg>
-  );
-}
-
-export function ConnectTheDotsIcon() {
-  return (
-    <svg {...svgProps}>
-      <polyline
-        points="4,19 9,7 15,14 20,4"
+      <path d="M11.5 5.8C9 4 5.4 3.8 2 4.8v14.8c3.4-1 7-.8 9.5.9z" fill={palette.teal} />
+      <path d="M12.5 5.8C15 4 18.6 3.8 22 4.8v14.8c-3.4-1-7-.8-9.5.9z" fill={palette.olive} />
+      <path
+        d="M4.2 8.6c1.8-.5 3.7-.4 5.4.3M4.2 11.6c1.8-.5 3.7-.4 5.4.3M4.2 14.6c1.8-.5 3.7-.4 5.4.3"
         fill="none"
-        stroke={palette.brownSoft}
+        stroke={palette.paper}
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <polyline
+        points="14.6,12.6 16.5,14.5 19.6,10.4"
+        fill="none"
+        stroke={palette.paper}
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="4" cy="19" r="2.4" fill={palette.teal} />
-      <circle cx="9" cy="7" r="2.4" fill={palette.coral} />
-      <circle cx="15" cy="14" r="2.4" fill={palette.gold} />
-      <circle cx="20" cy="4" r="2.4" fill={palette.olive} />
+    </svg>
+  );
+}
+
+export function ComingSoonIcon() {
+  return (
+    <svg {...svgProps}>
+      <path
+        d="M12 18.5V11"
+        fill="none"
+        stroke={palette.oliveSoft}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path d="M12 13.5c-3.8 0-6.4-2.3-6.8-5.9 3.8-.2 6.5 2.1 6.8 5.9z" fill={palette.oliveSoft} />
+      <path d="M12 11c.3-4.2 3.2-6.8 7.4-6.9-.1 4.2-3.2 6.8-7.4 6.9z" fill={palette.oliveSoft} />
+      <path d="M5 20.5c1.8-1.6 4.3-2.5 7-2.5s5.2.9 7 2.5z" fill={palette.brownSoft} />
     </svg>
   );
 }

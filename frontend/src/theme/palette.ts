@@ -11,7 +11,7 @@ export const palette = {
   cream: '#FBF3E4',
   paper: '#FFFDF7',
 
-  absent: '#9B8A76',
+  absent: '#000000',
 
   oliveSoft: '#A9A95E',
   goldSoft: '#FFDD7A',

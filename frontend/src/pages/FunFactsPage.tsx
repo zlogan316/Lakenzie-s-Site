@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { AnimationEvent, ReactNode } from 'react';
-import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha, keyframes } from '@mui/material/styles';
 import { createSvgIcon } from '@mui/material/utils';
 import { palette } from '../theme/palette';
-import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
+import { HIGHLIGHT_SCALE } from '../theme/highlight';
 import { assets, cssUrl } from '../assets';
+import { BackLink } from '../components/BackLink';
 
 type Side = 'left' | 'right';
 
@@ -17,11 +17,6 @@ const SIDES = ['left', 'right'] as const;
 const opposite = (side: Side): Side => (side === 'left' ? 'right' : 'left');
 
 const SIGN: Record<Side, number> = { left: 1, right: -1 };
-
-const ArrowBackRoundedIcon = createSvgIcon(
-  <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" />,
-  'ArrowBackRounded',
-);
 
 const InstagramIcon = createSvgIcon(
   <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />,
@@ -424,30 +419,6 @@ const STAGE_SX = {
       xl: 'min(1.1cqw, 3cqh)',
     },
   },
-} as const;
-
-const HIGHLIGHT = { ...HIGHLIGHT_SCALE, ...HIGHLIGHT_GLOW };
-
-const BACK_LINK_SX = {
-  position: 'absolute',
-  top: '0.75em',
-  left: '0.75em',
-  zIndex: 2,
-  display: 'flex',
-  p: '0.3em',
-  borderRadius: '50%',
-  fontSize: 'var(--type)',
-  color: palette.goldSoft,
-  stroke: palette.brown,
-  strokeWidth: 2,
-  strokeLinejoin: 'round',
-  paintOrder: 'stroke',
-  filter: `drop-shadow(0 0.1em 0.15em ${alpha(palette.navy, 0.45)})`,
-  transition: 'scale 200ms ease, filter 200ms ease',
-  WebkitTapHighlightColor: 'transparent',
-  '&:active, &:focus-visible': HIGHLIGHT,
-  '@media (hover: hover)': { '&:hover': HIGHLIGHT },
-  '&:focus-visible': { outline: `2px solid ${palette.gold}`, outlineOffset: '0.1em' },
 } as const;
 
 const CARD_SX = {
@@ -944,9 +915,7 @@ export function FunFactsPage() {
         Fun Facts
       </Typography>
 
-      <Box component={Link} to="/" aria-label="Back to home" sx={BACK_LINK_SX}>
-        <ArrowBackRoundedIcon sx={{ fontSize: '2.4em' }} />
-      </Box>
+      <BackLink to="/" label="Back to home" />
 
       <Ziggy
         side={side}

@@ -1,6 +1,8 @@
 export const assets = {
   banner: '/banner.png',
   clouds: '/clouds.svg',
+  dandelionBloom: '/dandelion_bloom.svg',
+  dandelionFrame: '/dandelion_frame.png',
   dandelionFrames: [
     '/Dandelion1.png',
     '/Dandelion2.png',
@@ -16,6 +18,7 @@ export const assets = {
     '/Dandelion12.png',
     '/Dandelion13.png',
   ],
+  dandelionTile: '/dandelion_tile.svg',
   hill: '/dandelion-heart-hill.png',
   leaf: '/Leaf_Left.svg',
   tree: '/Tree_Background_Streched.png',
@@ -38,5 +41,6 @@ export const assets = {
 export const DANDELION_PAGE_MM = 500;
 
 export const DANDELION_STEM_X = 0.2;
+export const DANDELION_STEM_Y = 0.877;
 
 export const cssUrl = (src: string) => `url("${src}")`;

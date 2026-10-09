@@ -5,11 +5,16 @@ import Typography from '@mui/material/Typography';
 import { keyframes } from '@mui/material/styles';
 import { palette } from '../theme/palette';
 import { HIGHLIGHT_GLOW, HIGHLIGHT_SCALE } from '../theme/highlight';
-import { DANDELION_PAGE_MM, DANDELION_STEM_X } from '../assets';
+import { DANDELION_PAGE_MM, DANDELION_STEM_X, DANDELION_STEM_Y } from '../assets';
+import {
+  DANDELION_BOTTOM_PCT,
+  DANDELION_WIDTH,
+  DANDELION_WIDTH_PCT,
+  FLOWER_WIDTH_MM,
+  LABEL_BOTTOM_VAR,
+  NUDGE_SWINGS_DEG,
+} from '../landingLayout';
 
-const STEM_ANCHOR_Y = 0.877;
-
-const FLOWER_WIDTH_MM = 27.675169;
 const FLOWER_HEIGHT_MM = 65.392;
 
 const LABEL_SIDE_PCT = 125;
@@ -18,13 +23,12 @@ const FLOWER_H_FRAC = FLOWER_HEIGHT_MM / (DANDELION_PAGE_MM * (1512 / 1890));
 
 const WINDOW_SIDE_FLOWER_WIDTHS = 1.5;
 const WINDOW_UP_FLOWER_HEIGHTS = 2;
-const WINDOW_BELOW_STEM_FLOWER_HEIGHTS = (1 - STEM_ANCHOR_Y) / FLOWER_H_FRAC;
+const WINDOW_BELOW_STEM_FLOWER_HEIGHTS = (1 - DANDELION_STEM_Y) / FLOWER_H_FRAC;
 const WINDOW_HEIGHT_FLOWER_HEIGHTS = WINDOW_UP_FLOWER_HEIGHTS + WINDOW_BELOW_STEM_FLOWER_HEIGHTS;
 const WINDOW_STEM_Y_PCT = (WINDOW_UP_FLOWER_HEIGHTS / WINDOW_HEIGHT_FLOWER_HEIGHTS) * 100;
 
 const NUDGE_PERIOD_MS = 8000;
 const NUDGE_SWING_MS = 160;
-const NUDGE_SWINGS_DEG = [3, -2.5, 1.75, -1, 0];
 const NUDGE_START_MS = NUDGE_PERIOD_MS - NUDGE_SWING_MS * NUDGE_SWINGS_DEG.length;
 
 const nudgeAt = (ms: number) => `${Number(((ms / NUDGE_PERIOD_MS) * 100).toFixed(4))}%`;
@@ -77,8 +81,12 @@ export function DandelionLink({
       sx={{
         position: 'absolute',
         left,
-        bottom: '-3%',
-        width: { xs: '20%', sm: '10%', md: '7.5%' },
+        bottom: `${DANDELION_BOTTOM_PCT}%`,
+        width: {
+          xs: DANDELION_WIDTH,
+          sm: `${DANDELION_WIDTH_PCT.sm}%`,
+          md: `${DANDELION_WIDTH_PCT.md}%`,
+        },
         aspectRatio: `${FLOWER_WIDTH_MM} / ${FLOWER_HEIGHT_MM}`,
         display: 'block',
         textDecoration: 'none',
@@ -108,18 +116,28 @@ export function DandelionLink({
         sx={{
           typography: { xs: 'h6', md: 'h4' },
           position: 'absolute',
-          bottom: { xs: '30%', md: '75.7%' },
+          bottom: { xs: '30%', md: `var(${LABEL_BOTTOM_VAR})` },
           ...(mirrored
-            ? { left: { xs: '50%', md: 'auto' }, right: { xs: 'auto', md: `${LABEL_SIDE_PCT}%` } }
-            : { left: { xs: '50%', md: `${LABEL_SIDE_PCT}%` } }),
-          transform: { xs: 'translate(-50%, 50%)', md: 'translateY(50%)' },
+            ? {
+                left: { xs: 'auto', sm: '50%', md: 'auto' },
+                right: { xs: 0, sm: 'auto', md: `${LABEL_SIDE_PCT}%` },
+              }
+            : { left: { xs: 0, sm: '50%', md: `${LABEL_SIDE_PCT}%` } }),
+          transform: { xs: 'translateY(50%)', sm: 'translate(-50%, 50%)', md: 'none' },
+          px: { md: '0.4em' },
+          py: { md: '0.1em' },
+          borderRadius: { md: '0.35em' },
+          bgcolor: { md: palette.brown },
           whiteSpace: 'nowrap',
           zIndex: 1,
           opacity: { xs: 1, md: departing ? 1 : 0 },
           '@media (hover: none)': { opacity: 1 },
           transition: 'opacity 200ms ease',
-          color: palette.brown,
-          textShadow: `0 0 0.3em ${palette.cream}, 0 0 0.6em ${palette.cream}`,
+          color: { xs: palette.brown, md: palette.goldSoft },
+          textShadow: {
+            xs: `0 0 0.3em ${palette.cream}, 0 0 0.6em ${palette.cream}`,
+            md: 'none',
+          },
           pointerEvents: 'none',
         }}
       >
@@ -163,8 +181,8 @@ export function DandelionLink({
               left: '50%',
               top: `${WINDOW_STEM_Y_PCT}%`,
               width: `${(100 * (DANDELION_PAGE_MM / FLOWER_WIDTH_MM)) / (2 * WINDOW_SIDE_FLOWER_WIDTHS)}%`,
-              transformOrigin: `${DANDELION_STEM_X * 100}% ${STEM_ANCHOR_Y * 100}%`,
-              transform: `translate(${-100 * DANDELION_STEM_X}%, ${-100 * STEM_ANCHOR_Y}%)`,
+              transformOrigin: `${DANDELION_STEM_X * 100}% ${DANDELION_STEM_Y * 100}%`,
+              transform: `translate(${-100 * DANDELION_STEM_X}%, ${-100 * DANDELION_STEM_Y}%)`,
               transition: 'scale 200ms ease',
               ...(departing && HIGHLIGHT_SCALE),
               pointerEvents: 'none',

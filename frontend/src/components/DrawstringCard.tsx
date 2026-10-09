@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
@@ -10,6 +10,7 @@ import { alpha } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { palette } from '../theme/palette';
 import { useElementSize } from '../hooks/useElementSize';
+import { FIT_VAR } from '../landingLayout';
 
 const EMPTY_COLLAPSED_FRACTION = 0.05;
 const FULL_PULL_HEIGHT_FRACTION = 0.6;
@@ -23,6 +24,12 @@ const CORD_THICKNESS_RATIO = 0.008;
 const BEAD_DIAMETER_RATIO = { xs: 0.16, sm: 0.05 };
 const BEAD_BORDER_RATIO = CORD_THICKNESS_RATIO / BEAD_DIAMETER_RATIO.sm;
 
+const FIT_FLOOR = 0.5;
+const FILL_CEILING = 1.6;
+const FIT_STEPS = 9;
+
+export type TextLine = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom'>;
+
 const SPRING_EASING = 'cubic-bezier(.22,1,.36,1)';
 const CARD_COLLAPSE_MS = 520;
 const SNAP_BACK_MS = 360;
@@ -35,10 +42,14 @@ const fullPullFor = (cardHeight: number) => Math.max(cardHeight * FULL_PULL_HEIG
 export function DrawstringCard({
   children,
   peek,
+  fill = false,
+  onFit,
   sx,
 }: {
   children?: ReactNode;
   peek?: ReactNode;
+  fill?: boolean;
+  onFit?: (lines: TextLine[], floor: number) => void;
   sx?: SxProps<Theme>;
 }) {
   const shellRef = useRef<HTMLDivElement>(null);
@@ -50,6 +61,70 @@ export function DrawstringCard({
   const gesture = useRef({ isActive: false, startY: 0, fullPull: 1, cordRest: 0 });
   const cordRef = useRef<HTMLDivElement>(null);
   const beadRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const shell = shellRef.current;
+    const card = cardRef.current;
+    const content = contentRef.current;
+    const copy = copyRef.current;
+    if (!shell || !card || !content || !copy) return;
+
+    const fit = () => {
+      const padding = getComputedStyle(content);
+      const room =
+        content.getBoundingClientRect().height -
+        parseFloat(padding.paddingTop) -
+        parseFloat(padding.paddingBottom);
+      const fitsAt = (scale: number) => {
+        card.style.setProperty(FIT_VAR, String(scale));
+        return copy.getBoundingClientRect().height <= room;
+      };
+      const ceiling = fill ? FILL_CEILING : 1;
+      if (!fitsAt(ceiling)) {
+        let fits = FIT_FLOOR;
+        let overflows = ceiling;
+        for (let step = 0; step < FIT_STEPS; step += 1) {
+          const scale = (fits + overflows) / 2;
+          if (fitsAt(scale)) fits = scale;
+          else overflows = scale;
+        }
+        fitsAt(fits);
+      }
+      if (!onFit) return;
+      const restOffset =
+        shell.getBoundingClientRect().top + CARD_BORDER - content.getBoundingClientRect().top;
+      const floor = content.getBoundingClientRect().bottom + restOffset;
+      const lines: TextLine[] = [];
+      const range = document.createRange();
+      const text = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+      for (let node = text.nextNode(); node; node = text.nextNode()) {
+        range.selectNodeContents(node);
+        for (const rect of Array.from(range.getClientRects())) {
+          if (rect.width > 0)
+            lines.push({
+              left: rect.left,
+              right: rect.right,
+              top: rect.top + restOffset,
+              bottom: rect.bottom + restOffset,
+            });
+        }
+      }
+      onFit(lines, floor);
+    };
+
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(content);
+    observer.observe(copy);
+    document.fonts.addEventListener('loadingdone', fit);
+    return () => {
+      observer.disconnect();
+      document.fonts.removeEventListener('loadingdone', fit);
+    };
+  }, [fill, onFit]);
 
   const collapsedHeight =
     peek && peekHeight ? peekHeight + CARD_BORDER * 2 : shellHeight * EMPTY_COLLAPSED_FRACTION;
@@ -145,6 +220,7 @@ export function DrawstringCard({
         }}
       >
         <Box
+          ref={cardRef}
           sx={{
             position: 'relative',
             width: '100%',
@@ -160,14 +236,14 @@ export function DrawstringCard({
           }}
         >
           <Box
+            ref={contentRef}
             sx={{
               position: 'absolute',
               left: 0,
               right: 0,
               bottom: 0,
               height: shellHeight ? shellHeight - CARD_BORDER * 2 : '100%',
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
+              overflow: 'hidden',
               containerType: 'inline-size',
               px: CONTENT_PAD_X,
               py: CONTENT_PAD_Y,
@@ -185,7 +261,7 @@ export function DrawstringCard({
                 justifyContent: 'center',
               }}
             >
-              {children}
+              <Box ref={copyRef}>{children}</Box>
             </Box>
           </Box>
 

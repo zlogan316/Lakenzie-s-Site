@@ -3,6 +3,7 @@ import { palette } from './palette';
 
 export const fontDisplay = "'Fraunces Variable', Georgia, serif";
 export const fontBody = "'Quicksand Variable', 'Trebuchet MS', sans-serif";
+export const fontTitle = "'Lilita One', cursive";
 
 const softShadow = `0 6px 24px ${alpha(palette.brown, 0.1)}`;
 

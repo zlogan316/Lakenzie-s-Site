@@ -4,11 +4,14 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { Theme } from '@mui/material/styles';
 import { palette } from '../theme/palette';
 import { assets, cssUrl } from '../assets';
 import { RibbonBanner, RIBBON_ASPECT } from '../components/RibbonBanner';
 import { DrawstringCard } from '../components/DrawstringCard';
 import { DandelionLink } from '../components/DandelionLink';
+import { DANDELION_WIDTH, FLOWER_HEAD_REACH, LABEL_ROOM_VAR, fitted } from '../landingLayout';
+import { useDandelionFit } from '../hooks/useDandelionFit';
 import {
   useDepartureClock,
   DEPARTURE_MS,
@@ -17,7 +20,7 @@ import {
 
 const CLOUD_TILES_PER_REEL = 16;
 
-const CLOUD_BAND_TOP_PCT = { xs: 5, sm: -4 };
+const CLOUD_BAND_TOP_PCT = { xs: -1, sm: -4 };
 const CLOUD_BAND_HEIGHT_PCT = { xs: 38, sm: 60 };
 const CLOUD_ART_BOTTOM = 0.6;
 
@@ -30,15 +33,26 @@ const CARD_TOP_PCT = {
   xs: cardTopPct(CLOUD_BAND_TOP_PCT.xs, CLOUD_BAND_HEIGHT_PCT.xs),
   sm: cardTopPct(CLOUD_BAND_TOP_PCT.sm, CLOUD_BAND_HEIGHT_PCT.sm),
 };
-const CARD_COPY = `What does it mean to be weird? Is it a way to describe someone wearing funny clothes and honking a horn? Maybe something you would use to describe a thingamajig, doohickey or whatchamacallit? Or maybe the word is so untamed that you can't pin it down to one definition. I would say that my own personal meaning doesn't fit into any of those bins! Instead, weird is a way of being, something that makes a person stand out in a crowd or the perfect item stand out in a thrift store! It's a word that's unique and full of quirk! And if you've ever been described with it, you might have the same diagnosis... but that's not a bad thing (or at the least, doesn't have to be). You have to harness your weirdness, not for clout or attention but instead for things you're passionate about. Soon you might make a difference, and no matter how small it might seem to others, the true difference is the one you make to yourself.`;
+const CARD_COPY = `What does it mean to be weird? Is it a way to describe someone wearing funny clothes and honking a horn? Maybe something you would use to describe a thingamajig, doohickey or whatchamacallit? Or maybe the word is so untamed that you can't pin it down to one definition. I would say that my own personal meaning doesn't fit into any of those bins! Instead, weird is a way of being, something that makes a person stand out in a crowd or the perfect item stand out in a thrift store!
+
+It's a word that's unique and full of quirk! And if you've ever been described with it, you might have the same diagnosis... but that's not a bad thing (or at the least, doesn't have to be). You have to harness your weirdness, not for clout or attention but instead for things you're passionate about. Soon you might make a difference, and no matter how small it might seem to others, the true difference is the one you make to yourself.`;
 
 const CARD_COPY_SX = {
   color: palette.brown,
   lineHeight: { xs: 1.4, sm: 1.6 },
   fontWeight: 500,
   textAlign: 'center',
-  fontSize: { xs: '5cqw', sm: '3.8cqw', md: '2.6cqw', lg: '2.1cqw', xl: '1.9cqw' },
+  whiteSpace: 'pre-line',
+  fontSize: {
+    xs: fitted('5cqw'),
+    sm: fitted('3.8cqw'),
+    md: fitted('2.6cqw'),
+    lg: fitted('2.1cqw'),
+    xl: fitted('1.9cqw'),
+  },
 } as const;
+
+const LABEL_ROOM_SX = { py: { md: `calc(var(${LABEL_ROOM_VAR}) / 2 + 0.25em)` } } as const;
 
 const CARD_PEEK = (
   <Typography sx={CARD_COPY_SX}>
@@ -50,9 +64,21 @@ const CARD_PEEK = (
   </Typography>
 );
 
+const DANDELION_INSET = Number((FLOWER_HEAD_REACH - 0.5).toFixed(3));
+
 const DANDELIONS = [
-  { to: '/games', label: 'Games', left: { xs: '8%', sm: '11%', md: '12%' }, mirrored: false },
-  { to: '/fun-facts', label: 'Fun Facts', left: { xs: '72%', sm: '79%', md: '80.5%' }, mirrored: true },
+  {
+    to: '/games',
+    label: 'Games',
+    left: { xs: `calc(${DANDELION_WIDTH} * ${DANDELION_INSET})`, sm: '11%', md: '12%' },
+    mirrored: false,
+  },
+  {
+    to: '/fun-facts',
+    label: 'Fun Facts',
+    left: { xs: `calc(100% - ${DANDELION_WIDTH} * ${1 + DANDELION_INSET})`, sm: '79%', md: '80.5%' },
+    mirrored: true,
+  },
 ] as const;
 
 let framesWarmed = false;
@@ -119,6 +145,9 @@ export function LandingPage() {
   const warmedFrames = useRef<HTMLImageElement[]>([]);
 
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const isPhone = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const containerRef = useRef<HTMLDivElement>(null);
+  const fitDandelions = useDandelionFit(containerRef, isPhone);
   const durationMs = reducedMotion ? REDUCED_DEPARTURE_MS : DEPARTURE_MS;
   const frames = assets.dandelionFrames;
 
@@ -195,6 +224,7 @@ export function LandingPage() {
       <CloudStrip />
 
       <Container
+        ref={containerRef}
         maxWidth={false}
         sx={{
           position: 'relative',
@@ -223,7 +253,7 @@ export function LandingPage() {
         >
           <Box
             sx={{
-              width: { xs: '80%', sm: 'auto' },
+              width: { xs: '100%', sm: 'auto' },
               height: { sm: '80%' },
               aspectRatio: { sm: RIBBON_ASPECT },
               maxWidth: { sm: '64%' },
@@ -247,8 +277,13 @@ export function LandingPage() {
             justifyContent: 'center',
           }}
         >
-          <DrawstringCard sx={{ height: '100%' }} peek={CARD_PEEK}>
-            <Typography sx={CARD_COPY_SX}>{CARD_COPY}</Typography>
+          <DrawstringCard
+            sx={{ height: '100%' }}
+            peek={CARD_PEEK}
+            fill={isPhone}
+            onFit={fitDandelions}
+          >
+            <Typography sx={[CARD_COPY_SX, LABEL_ROOM_SX]}>{CARD_COPY}</Typography>
           </DrawstringCard>
         </Box>
         {DANDELIONS.map((d) => {
