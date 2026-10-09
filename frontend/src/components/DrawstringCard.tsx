@@ -382,7 +382,6 @@ export function DrawstringCard({
             ref={beadRef}
             role="switch"
             aria-checked={isCollapsed}
-            aria-label="Pull the drawstring to shrink the card; pull again to restore it"
             tabIndex={0}
             onPointerDown={startPull}
             onPointerMove={trackPull}
