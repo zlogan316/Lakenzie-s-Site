@@ -566,7 +566,6 @@ function Petal({
         fontFamily={fontTitle}
         fontSize={LETTER_SIZE}
         textAnchor="middle"
-        dominantBaseline="central"
       >
         {bands.map((band, b) => {
           const cx = band.x + band.width / 2;
@@ -591,6 +590,7 @@ function Petal({
                 <SvgText
                   x={cx}
                   y={band.cy}
+                  dominantBaseline="central"
                   sx={[
                     { fill: marks ? MARK_INK[marks[b]] : palette.brownDeep },
                     typing && POP_SX,
