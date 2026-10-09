@@ -1,7 +1,6 @@
 import { alpha, createTheme } from '@mui/material/styles';
 import { palette } from './palette';
 
-export const fontDisplay = "'Fraunces Variable', Georgia, serif";
 export const fontBody = "'Quicksand Variable', 'Trebuchet MS', sans-serif";
 export const fontTitle = "'Lilita One', cursive";
 
@@ -21,9 +20,9 @@ export const theme = createTheme({
 
   typography: {
     fontFamily: fontBody,
-    h1: { fontFamily: fontDisplay, fontWeight: 560, letterSpacing: '-0.015em' },
-    h2: { fontFamily: fontDisplay, fontWeight: 540, letterSpacing: '-0.01em' },
-    h3: { fontFamily: fontDisplay, fontWeight: 520 },
+    h1: { fontWeight: 560, letterSpacing: '-0.015em' },
+    h2: { fontWeight: 540, letterSpacing: '-0.01em' },
+    h3: { fontWeight: 520 },
     h4: { fontFamily: fontBody, fontWeight: 700 },
     h5: { fontFamily: fontBody, fontWeight: 700 },
     h6: { fontFamily: fontBody, fontWeight: 700 },

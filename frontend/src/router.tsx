@@ -3,8 +3,7 @@ import { AppShell } from './components/AppShell';
 import { LandingPage } from './pages/LandingPage';
 import { GamesPage } from './pages/GamesPage';
 import { WordGuessPage } from './pages/WordGuessPage';
-import { DictionaryMatchPage } from './pages/DictionaryMatchPage';
-import { FunFactsPage } from './pages/FunFactsPage';
+import { InfoPage } from './pages/InfoPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
 import { comingSoon } from './comingSoon';
 
@@ -19,11 +18,7 @@ export const router = createBrowserRouter([
         path: 'games/word-guess',
         Component: comingSoon.games ? ComingSoonPage : WordGuessPage,
       },
-      {
-        path: 'games/dictionary-match',
-        Component: comingSoon.games ? ComingSoonPage : DictionaryMatchPage,
-      },
-      { path: 'fun-facts', Component: comingSoon.funFacts ? ComingSoonPage : FunFactsPage },
+      { path: 'info', Component: comingSoon.info ? ComingSoonPage : InfoPage },
     ],
   },
 ]);

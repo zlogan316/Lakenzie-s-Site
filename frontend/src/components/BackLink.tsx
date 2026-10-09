@@ -11,13 +11,19 @@ const ArrowBackRoundedIcon = createSvgIcon(
   'ArrowBackRounded',
 );
 
+const INSET_EM = 0.75;
+const PADDING_EM = 0.3;
+const ICON_EM = 2.4;
+
+export const BACK_LINK_BOTTOM = `calc((${INSET_EM} + ${ICON_EM} + 2 * ${PADDING_EM}) * var(--type))`;
+
 const HIGHLIGHT = { ...HIGHLIGHT_SCALE, ...HIGHLIGHT_GLOW };
 
 const BACK_LINK_SX = {
   position: 'absolute',
   zIndex: (theme: Theme) => theme.zIndex.modal + 1,
   display: 'flex',
-  p: '0.3em',
+  p: `${PADDING_EM}em`,
   borderRadius: '50%',
   fontSize: 'var(--type)',
   color: palette.goldSoft,
@@ -36,7 +42,7 @@ const BACK_LINK_SX = {
 export function BackLink({
   to,
   label,
-  inset = '0.75em',
+  inset = `${INSET_EM}em`,
 }: {
   to: string;
   label: string;
@@ -49,7 +55,7 @@ export function BackLink({
       aria-label={label}
       sx={[BACK_LINK_SX, { top: inset, left: inset }]}
     >
-      <ArrowBackRoundedIcon sx={{ fontSize: '2.4em' }} />
+      <ArrowBackRoundedIcon sx={{ fontSize: `${ICON_EM}em` }} />
     </Box>
   );
 }

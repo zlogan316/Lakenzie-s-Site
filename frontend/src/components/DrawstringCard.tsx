@@ -24,6 +24,18 @@ const CORD_THICKNESS_RATIO = 0.008;
 const BEAD_DIAMETER_RATIO = { xs: 0.16, sm: 0.05 };
 const BEAD_BORDER_RATIO = CORD_THICKNESS_RATIO / BEAD_DIAMETER_RATIO.sm;
 
+const SHADE_RATIO = {
+  roller: 0.28,
+  rollerOverhang: 0.16,
+  bracketWidth: 0.2,
+  bracketHeight: 0.45,
+  bracketOffset: 0.28,
+  bracketRise: 0.08,
+  hem: 0.2,
+  hemOverhang: 0.08,
+  outline: 0.04,
+} as const;
+
 const FIT_FLOOR = 0.5;
 const FILL_CEILING = 1.6;
 const FIT_STEPS = 9;
@@ -64,13 +76,14 @@ export function DrawstringCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
+  const rollerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const shell = shellRef.current;
+    const roller = rollerRef.current;
     const card = cardRef.current;
     const content = contentRef.current;
     const copy = copyRef.current;
-    if (!shell || !card || !content || !copy) return;
+    if (!roller || !card || !content || !copy) return;
 
     const fit = () => {
       const padding = getComputedStyle(content);
@@ -94,8 +107,7 @@ export function DrawstringCard({
         fitsAt(fits);
       }
       if (!onFit) return;
-      const restOffset =
-        shell.getBoundingClientRect().top + CARD_BORDER - content.getBoundingClientRect().top;
+      const restOffset = roller.getBoundingClientRect().bottom - content.getBoundingClientRect().top;
       const floor = content.getBoundingClientRect().bottom + restOffset;
       const lines: TextLine[] = [];
       const range = document.createRange();
@@ -126,17 +138,24 @@ export function DrawstringCard({
     };
   }, [fill, onFit]);
 
-  const collapsedHeight =
-    peek && peekHeight ? peekHeight + CARD_BORDER * 2 : shellHeight * EMPTY_COLLAPSED_FRACTION;
-  const cardHeight = isCollapsed ? collapsedHeight : shellHeight;
-  const bottomEdgeRise = shellHeight - cardHeight;
-
   const isMobile = useMediaQuery((t: Theme) => t.breakpoints.down('sm'));
   const beadRatio = isMobile ? BEAD_DIAMETER_RATIO.xs : BEAD_DIAMETER_RATIO.sm;
 
   const beadRestingSize = shellWidth * beadRatio;
   const beadBorder = beadRestingSize * BEAD_BORDER_RATIO;
   const cordThickness = shellWidth * CORD_THICKNESS_RATIO;
+
+  const rollerHeight = beadRestingSize * SHADE_RATIO.roller;
+  const hemHeight = beadRestingSize * SHADE_RATIO.hem;
+  const outlineWidth = beadRestingSize * SHADE_RATIO.outline;
+  const shadeOutline = `${outlineWidth}px solid ${palette.brown}`;
+
+  const collapsedHeight =
+    rollerHeight +
+    hemHeight +
+    (peek && peekHeight ? peekHeight : shellHeight * EMPTY_COLLAPSED_FRACTION);
+  const cardHeight = isCollapsed ? collapsedHeight : shellHeight;
+  const bottomEdgeRise = shellHeight - cardHeight;
 
   const snapBack = isDragging ? 'none' : `${SNAP_BACK_MS}ms ${SPRING_EASING}`;
   const fade = `opacity ${CARD_COLLAPSE_MS}ms ${SPRING_EASING}`;
@@ -226,11 +245,11 @@ export function DrawstringCard({
             width: '100%',
             flex: 'none',
             height: shellHeight ? cardHeight : '100%',
-            overflow: 'hidden',
+            clipPath: 'inset(0 -10% 0 -10%)',
             bgcolor: palette.oliveSoft,
-            border: `${CARD_BORDER}px solid ${palette.olive}`,
-            borderRadius: '32px',
-            boxShadow: `0 14px 36px ${alpha(palette.brown, 0.12)}`,
+            borderLeft: `${CARD_BORDER}px solid ${palette.olive}`,
+            borderRight: `${CARD_BORDER}px solid ${palette.olive}`,
+            boxShadow: `-${outlineWidth}px 0 0 ${palette.brown}, ${outlineWidth}px 0 0 ${palette.brown}`,
             transition: `height ${CARD_COLLAPSE_MS}ms ${SPRING_EASING}`,
             ...RESPECT_REDUCED_MOTION,
           }}
@@ -241,8 +260,8 @@ export function DrawstringCard({
               position: 'absolute',
               left: 0,
               right: 0,
-              bottom: 0,
-              height: shellHeight ? shellHeight - CARD_BORDER * 2 : '100%',
+              bottom: hemHeight,
+              height: shellHeight ? shellHeight - rollerHeight - hemHeight : '100%',
               overflow: 'hidden',
               containerType: 'inline-size',
               px: CONTENT_PAD_X,
@@ -273,7 +292,7 @@ export function DrawstringCard({
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                bottom: 0,
+                bottom: hemHeight,
                 containerType: 'inline-size',
                 px: CONTENT_PAD_X,
                 py: CONTENT_PAD_Y,
@@ -286,7 +305,49 @@ export function DrawstringCard({
               {peek}
             </Box>
           )}
+
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              left: -(CARD_BORDER + beadRestingSize * SHADE_RATIO.hemOverhang),
+              right: -(CARD_BORDER + beadRestingSize * SHADE_RATIO.hemOverhang),
+              bottom: 0,
+              height: hemHeight,
+              bgcolor: palette.olive,
+              border: shadeOutline,
+            }}
+          />
         </Box>
+
+        <Box
+          ref={rollerRef}
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: -beadRestingSize * SHADE_RATIO.rollerOverhang,
+            right: -beadRestingSize * SHADE_RATIO.rollerOverhang,
+            height: rollerHeight,
+            bgcolor: palette.olive,
+            border: shadeOutline,
+          }}
+        />
+        {(['left', 'right'] as const).map((side) => (
+          <Box
+            key={side}
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              top: -beadRestingSize * SHADE_RATIO.bracketRise,
+              [side]: -beadRestingSize * SHADE_RATIO.bracketOffset,
+              width: beadRestingSize * SHADE_RATIO.bracketWidth,
+              height: beadRestingSize * SHADE_RATIO.bracketHeight,
+              bgcolor: palette.olive,
+              border: shadeOutline,
+            }}
+          />
+        ))}
 
         <Box
           sx={{

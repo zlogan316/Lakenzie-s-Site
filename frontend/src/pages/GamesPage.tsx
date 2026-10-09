@@ -8,7 +8,7 @@ import { fontTitle } from '../theme/theme';
 import { DANDELION_FRAME_SX, FRAME_INSET, FRAME_SIZE, FRAME_TYPE } from '../theme/dandelionFrame';
 import { BackLink } from '../components/BackLink';
 import { GameCard } from '../components/GameCard';
-import { WordGuessIcon, DictionaryMatchIcon, ComingSoonIcon } from '../components/gameIcons';
+import { WordGuessIcon, ComingSoonIcon } from '../components/gameIcons';
 
 const GAMES = [
   {
@@ -17,13 +17,6 @@ const GAMES = [
     description: 'Guess the word in six tries.',
     icon: <WordGuessIcon />,
     to: '/games/word-guess',
-  },
-  {
-    id: 'dictionary-match',
-    title: 'Dictionary Match',
-    description: 'Pick the word that fits the definition.',
-    icon: <DictionaryMatchIcon />,
-    to: '/games/dictionary-match',
   },
 ] as const;
 

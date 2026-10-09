@@ -11,16 +11,16 @@ const svgProps = {
   focusable: false,
 } as const;
 
+const IMG_SX = { display: 'block', width: '100%', height: '100%', objectFit: 'contain' } as const;
+
+const BLOOM_ART_WIDTH = 120.566 / 194.87;
+
+const SPROUT_ART_ASPECT = 66.056 / 67.832;
+
+const BLOOM_SX = { ...IMG_SX, scale: String(SPROUT_ART_ASPECT / BLOOM_ART_WIDTH) } as const;
+
 export function WordGuessIcon() {
-  return (
-    <Box
-      component="img"
-      src={assets.dandelionBloom}
-      alt=""
-      draggable={false}
-      sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
-    />
-  );
+  return <Box component="img" src={assets.dandelionBloom} alt="" draggable={false} sx={BLOOM_SX} />;
 }
 
 export function DictionaryMatchIcon() {
@@ -48,18 +48,5 @@ export function DictionaryMatchIcon() {
 }
 
 export function ComingSoonIcon() {
-  return (
-    <svg {...svgProps}>
-      <path
-        d="M12 18.5V11"
-        fill="none"
-        stroke={palette.oliveSoft}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path d="M12 13.5c-3.8 0-6.4-2.3-6.8-5.9 3.8-.2 6.5 2.1 6.8 5.9z" fill={palette.oliveSoft} />
-      <path d="M12 11c.3-4.2 3.2-6.8 7.4-6.9-.1 4.2-3.2 6.8-7.4 6.9z" fill={palette.oliveSoft} />
-      <path d="M5 20.5c1.8-1.6 4.3-2.5 7-2.5s5.2.9 7 2.5z" fill={palette.brownSoft} />
-    </svg>
-  );
+  return <Box component="img" src={assets.comingSoonIcon} alt="" draggable={false} sx={IMG_SX} />;
 }

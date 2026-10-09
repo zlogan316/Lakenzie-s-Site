@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { AnimationEvent, ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -8,7 +8,7 @@ import { createSvgIcon } from '@mui/material/utils';
 import { palette } from '../theme/palette';
 import { HIGHLIGHT_SCALE } from '../theme/highlight';
 import { assets, cssUrl } from '../assets';
-import { BackLink } from '../components/BackLink';
+import { BackLink, BACK_LINK_BOTTOM } from '../components/BackLink';
 
 type Side = 'left' | 'right';
 
@@ -36,6 +36,18 @@ const YouTubeIcon = createSvgIcon(
   'YouTube',
 );
 
+const ArrowDownIcon = createSvgIcon(
+  <path
+    d="M6 9l6 6 6-6"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.6}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  'ArrowDown',
+);
+
 const SOCIALS = [
   { label: 'Instagram', href: 'https://www.instagram.com/_lakenzo_/', Icon: InstagramIcon },
   { label: 'TikTok', href: 'https://www.tiktok.com/@_lakenzo_', Icon: TikTokIcon },
@@ -45,7 +57,51 @@ const SOCIALS = [
 const ABOUT_ME = {
   heading: 'About Me',
   paragraph:
-    'This is placeholder text. A short introduction will live here soon. Until then, Ziggy is keeping the leaf warm.',
+    'Greetings! You’ve made it to my website! My name is LaKenzie. I’m more commonly known as the girl with the dandelion crayon wall and the girl that makes the SpongeBob crafts. I’m all about encouraging others to channel their inner child and create what makes their brain silly and heart happy :)',
+  factsHeading: 'Fun Facts',
+  factsCredit: 'These amazing questions were provided by my lovely followers on Instagram.',
+  questions: [
+    {
+      question: 'If you could have any random skill what would it be?',
+      answer: 'Yodeling',
+    },
+    {
+      question: 'What kinda music do ya listen to?',
+      answer: 'Mostly granny music. Classic rock, old country, and folk I’d say are my favorite genres right now',
+    },
+    {
+      question: 'Weirdest food combo you like?',
+      answer: 'Chocolate chip cookies dipped in orange juice (you are NOT allowed to call it gross until you try it!)',
+    },
+    {
+      question: 'What’s your favorite niche animal?',
+      answer: 'Quokka',
+    },
+    {
+      question: 'Any favorite childhood picture book?',
+      answer: 'Arnie the Doughnut (and I Spy books of course)',
+    },
+    {
+      question: 'Of your trinkets, which ones are most likely to start a coup and take over the craft room?',
+      answer: 'I have a drawer in my craft room full of stray doll appendages…so maybe them',
+    },
+    {
+      question: 'If you were a little frog, where would you live, and what would your profession be?',
+      answer: 'I’d be a cobbler that lives in an old boot.',
+    },
+    {
+      question: 'The oddest scent you enjoy?',
+      answer: 'A musty basement',
+    },
+    {
+      question: 'What’s the craziest thing you found while trinket searching at garage sales or thrift shops?',
+      answer: 'Loose human teeth in a shoebox',
+    },
+    {
+      question: 'What’s one of your favorite niche lines from SpongeBob?',
+      answer: '“Oh! So now the talking CHEESE is gonna preach to us!”',
+    },
+  ],
 } as const;
 
 const YOUTUBE_CHANNEL_ID: string = 'UCQlup0XeMHCYvKE8GPFzwZg';
@@ -439,6 +495,10 @@ const CARD_SX = {
   boxShadow: `0 0.6em 1.6em ${alpha(palette.navy, 0.4)}`,
 } as const;
 
+const PAGER_CARD_SX = { ...CARD_SX, overflow: 'hidden' } as const;
+
+const STRETCH_CARD_SX = { ...PAGER_CARD_SX, flex: 1, minHeight: 0 } as const;
+
 const TITLE_SX = {
   fontFamily: TITLE_FONT,
   fontWeight: 400,
@@ -451,6 +511,35 @@ const BODY_SX = {
   lineHeight: 1.55,
   fontWeight: 500,
   maxWidth: '30em',
+} as const;
+
+const DIVIDER_SX = {
+  flexShrink: 0,
+  width: '100%',
+  maxWidth: '30em',
+  height: '0.18em',
+  m: 0,
+  border: 0,
+  borderRadius: '999em',
+  bgcolor: palette.olive,
+} as const;
+
+const QA_LIST_SX = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.9em',
+  width: '100%',
+  maxWidth: '30em',
+  m: 0,
+  textAlign: 'left',
+} as const;
+
+const QA_LINE_SX = {
+  display: 'grid',
+  gridTemplateColumns: '1.4em 1fr',
+  fontSize: '1em',
+  lineHeight: 1.55,
+  fontWeight: 500,
 } as const;
 
 const HINT_SX = {
@@ -478,6 +567,61 @@ const SOCIAL_LINK_SX = {
   '&:active': { bgcolor: palette.gold, ...HIGHLIGHT_SCALE },
   '@media (hover: hover)': { '&:hover': { bgcolor: palette.gold, ...HIGHLIGHT_SCALE } },
   '&:focus-visible': { outline: `2px solid ${palette.brown}`, outlineOffset: '0.2em' },
+} as const;
+
+const PAGE_SX = {
+  position: 'relative',
+  flex: 1,
+  minHeight: 0,
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '0.9em',
+} as const;
+
+const PAGE_ITEMS_SX = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '0.9em',
+  width: '100%',
+} as const;
+
+const MEASURE_SX = {
+  ...PAGE_ITEMS_SX,
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  visibility: 'hidden',
+  pointerEvents: 'none',
+} as const;
+
+const PAGE_BUTTON_SX = {
+  mt: 'auto',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.3em',
+  px: '0.6em',
+  py: '0.5em',
+  border: 0,
+  bgcolor: 'transparent',
+  fontFamily: TITLE_FONT,
+  fontSize: '1.25em',
+  fontWeight: 400,
+  color: palette.brownDeep,
+  cursor: 'pointer',
+  WebkitTapHighlightColor: 'transparent',
+  '& svg': { transition: 'translate 200ms ease' },
+  '&:active svg': { translate: '0 var(--nudge)' },
+  '@media (hover: hover)': { '&:hover svg': { translate: '0 var(--nudge)' } },
+  '&:focus-visible': { outline: `2px solid ${palette.brownDeep}`, outlineOffset: '0.1em', borderRadius: '0.2em' },
+} as const;
+
+const PAGE_BUTTON_LABEL_SX = {
+  textDecoration: 'underline',
+  textDecorationThickness: '0.1em',
+  textUnderlineOffset: '0.18em',
 } as const;
 
 const VIDEO_FRAME_SX = {
@@ -704,26 +848,32 @@ function SectionContent({
   title,
   side,
   nextTitle,
+  pager = false,
+  stretch = false,
   children,
 }: {
   headingId: string;
   title: string;
   side: Side;
   nextTitle: string;
+  pager?: boolean;
+  stretch?: boolean;
   children: ReactNode;
 }) {
   return (
     <Box
       sx={{
         position: 'absolute',
-        top: `${CONTENT_TOP_CQH.portrait}cqh`,
+        top: pager
+          ? `max(${CONTENT_TOP_CQH.portrait}cqh, ${BACK_LINK_BOTTOM})`
+          : `${CONTENT_TOP_CQH.portrait}cqh`,
         left: `${PAGE_GUTTER_CQW}cqw`,
         right: `${PAGE_GUTTER_CQW}cqw`,
         bottom: `calc(100cqh - var(--leaf-top) + ${ANGRY_ABOVE_LEAF} * var(--leaf-width) + ${CONTENT_ABOVE_FROG_CQH}cqh)`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: pager ? 'flex-start' : 'center',
         gap: '0.9em',
         textAlign: 'center',
         fontSize: 'var(--type)',
@@ -735,7 +885,7 @@ function SectionContent({
         },
       }}
     >
-      <Box sx={CARD_SX}>
+      <Box sx={stretch ? STRETCH_CARD_SX : pager ? PAGER_CARD_SX : CARD_SX}>
         <Typography id={headingId} component="h2" sx={TITLE_SX}>
           {title}
         </Typography>
@@ -796,6 +946,160 @@ function SocialLinks() {
           </Box>
         </Box>
       ))}
+    </Box>
+  );
+}
+
+type Qa = { question: string; answer: string };
+
+type Plan = { single: boolean; factPages: number[][] };
+
+const spareRoom = (page: HTMLElement) => {
+  const card = page.parentElement;
+  const area = card?.parentElement;
+  const hint = card?.nextElementSibling;
+  if (!card || !area || !hint) return 0;
+  return (
+    area.getBoundingClientRect().height -
+    (hint.getBoundingClientRect().bottom - card.getBoundingClientRect().top)
+  );
+};
+
+const fullestPage = (left: number[], heights: number[], gap: number, room: number) => {
+  let best = [left[0]];
+  let bestHeight = 0;
+  const extend = (pick: number[], height: number, from: number) => {
+    if (height > bestHeight) {
+      best = pick;
+      bestHeight = height;
+    }
+    for (let next = from; next < left.length; next += 1) {
+      const nextHeight = height + (pick.length > 0 ? gap : 0) + heights[left[next]];
+      if (nextHeight <= room) extend([...pick, left[next]], nextHeight, next + 1);
+    }
+  };
+  extend([], 0, 0);
+  return best;
+};
+
+const packFactPages = (heights: number[], gap: number, firstRoom: number, room: number) => {
+  const pages: number[][] = [];
+  let left = heights.map((_, index) => index);
+  while (left.length > 0) {
+    const pick = fullestPage(left, heights, gap, pages.length === 0 ? firstRoom : room);
+    pages.push(pick);
+    left = left.filter((index) => !pick.includes(index));
+  }
+  return pages;
+};
+
+const readPlan = (page: HTMLElement, measure: HTMLElement): Plan => {
+  const [paragraph, , credit, , list, button] = Array.from(measure.children);
+  const questions = Array.from(list.children).map((item) => item.getBoundingClientRect());
+  const lastBottom = questions[questions.length - 1].bottom;
+  const room = page.getBoundingClientRect().height + spareRoom(page);
+  const buttonRoom = button.getBoundingClientRect().bottom - lastBottom;
+  const creditRoom = questions[0].top - credit.getBoundingClientRect().top;
+  return {
+    single: lastBottom - paragraph.getBoundingClientRect().top - creditRoom <= room,
+    factPages: packFactPages(
+      questions.map((question) => question.height),
+      parseFloat(getComputedStyle(list).rowGap),
+      room - buttonRoom - creditRoom,
+      room - buttonRoom,
+    ),
+  };
+};
+
+function FactsCredit() {
+  return (
+    <>
+      <Typography sx={BODY_SX}>{ABOUT_ME.factsCredit}</Typography>
+      <Box component="hr" sx={DIVIDER_SX} />
+    </>
+  );
+}
+
+function QaList({ questions }: { questions: readonly Qa[] }) {
+  return (
+    <Box component="dl" sx={QA_LIST_SX}>
+      {questions.map(({ question, answer }) => (
+        <div key={question}>
+          <Typography component="dt" sx={{ ...QA_LINE_SX, fontWeight: 700 }}>
+            <span>Q:</span>
+            {question}
+          </Typography>
+          <Typography component="dd" sx={QA_LINE_SX}>
+            <Box component="span" sx={{ fontWeight: 700 }}>
+              A:
+            </Box>
+            {answer}
+          </Typography>
+        </div>
+      ))}
+    </Box>
+  );
+}
+
+function PageButton({ back, onClick }: { back: boolean; onClick?: () => void }) {
+  return (
+    <Box component="button" type="button" onClick={onClick} sx={PAGE_BUTTON_SX}>
+      <Box component="span" sx={PAGE_BUTTON_LABEL_SX}>
+        {back ? 'Back to start' : 'Show more'}
+      </Box>
+      <ArrowDownIcon
+        sx={{ fontSize: '1em', rotate: back ? '180deg' : 'none', '--nudge': back ? '-0.15em' : '0.15em' }}
+      />
+    </Box>
+  );
+}
+
+function AboutMe({ page, onPage }: { page: number; onPage: (page: number) => void }) {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
+
+  useLayoutEffect(() => {
+    const pageBox = pageRef.current;
+    const measure = measureRef.current;
+    const area = pageBox?.parentElement?.parentElement;
+    if (!pageBox || !measure || !area) return;
+    const observer = new ResizeObserver(() => setPlan(readPlan(pageBox, measure)));
+    observer.observe(area);
+    observer.observe(pageBox);
+    observer.observe(measure);
+    return () => observer.disconnect();
+  }, []);
+
+  const single = !plan || plan.single;
+  const factPages = plan?.factPages ?? [];
+  const shown = Math.min(page, factPages.length);
+  const atEnd = shown === factPages.length;
+  const questions =
+    shown > 0
+      ? factPages[shown - 1].map((index) => ABOUT_ME.questions[index])
+      : single
+        ? ABOUT_ME.questions
+        : [];
+
+  return (
+    <Box ref={pageRef} sx={PAGE_SX}>
+      <Box aria-live="polite" sx={PAGE_ITEMS_SX}>
+        {shown === 0 && <Typography sx={BODY_SX}>{ABOUT_ME.paragraph}</Typography>}
+        {shown === 0 && single && <Box component="hr" sx={DIVIDER_SX} />}
+        {shown === 1 && <FactsCredit />}
+        {questions.length > 0 && <QaList questions={questions} />}
+      </Box>
+      {(shown > 0 || !single) && (
+        <PageButton back={atEnd} onClick={() => onPage(atEnd ? 0 : shown + 1)} />
+      )}
+      <Box ref={measureRef} inert sx={MEASURE_SX}>
+        <Typography sx={BODY_SX}>{ABOUT_ME.paragraph}</Typography>
+        <Box component="hr" sx={DIVIDER_SX} />
+        <FactsCredit />
+        <QaList questions={ABOUT_ME.questions} />
+        <PageButton back={false} />
+      </Box>
     </Box>
   );
 }
@@ -889,8 +1193,9 @@ function DandelionCount({ shown }: { shown: boolean }) {
   );
 }
 
-export function FunFactsPage() {
+export function InfoPage() {
   const [carousel, setCarousel] = useState<Carousel>({ current: 0, hopping: false });
+  const [aboutPage, setAboutPage] = useState(0);
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   const { current, hopping } = carousel;
@@ -912,7 +1217,7 @@ export function FunFactsPage() {
   return (
     <Box sx={STAGE_SX}>
       <Typography id="page-heading" tabIndex={-1} component="h1" sx={VISUALLY_HIDDEN}>
-        Fun Facts
+        Info
       </Typography>
 
       <BackLink to="/" label="Back to home" />
@@ -930,7 +1235,9 @@ export function FunFactsPage() {
       {SECTIONS.map((section, index) => {
         const isCurrent = index === current;
         const isNext = hopping && index === next;
-        const headingId = `fun-facts-${section.id}`;
+        const headingId = `info-${section.id}`;
+        const isAbout = section.id === 'about';
+        const isFunFacts = isAbout && aboutPage > 0;
         const slideAnimation =
           hop && isCurrent ? hop.slideOut : hop && isNext ? hop.slideIn : 'none';
         const leafAnimation =
@@ -951,12 +1258,14 @@ export function FunFactsPage() {
             <Leaf side={section.side} animation={leafAnimation} />
             <SectionContent
               headingId={headingId}
-              title={section.title}
+              title={isFunFacts ? ABOUT_ME.factsHeading : section.title}
               side={section.side}
               nextTitle={SECTIONS[(index + 1) % SECTIONS.length].title}
+              pager={isAbout}
+              stretch={isFunFacts}
             >
               {section.id === 'socials' && <SocialLinks />}
-              {section.id === 'about' && <Typography sx={BODY_SX}>{ABOUT_ME.paragraph}</Typography>}
+              {section.id === 'about' && <AboutMe page={aboutPage} onPage={setAboutPage} />}
               {section.id === 'video' && <LatestVideo shown={isCurrent || isNext} />}
               {section.id === 'dandelions' && <DandelionCount shown={isCurrent || isNext} />}
             </SectionContent>

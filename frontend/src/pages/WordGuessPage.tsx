@@ -14,11 +14,11 @@ import { FRAME_TITLE_SX } from '../theme/dandelionFrame';
 import { readStorage, toWordList, writeStorage } from '../storage';
 import {
   BLOOM,
+  BOX_SIZE,
   FILLER_PETALS,
   FLOWER_ABOVE,
   FLOWER_BELOW,
   FLOWER_RADIUS,
-  PETAL_BANDS,
   PETALS,
   TRIMMED_BELOW,
 } from '../data/dandelionGuess';
@@ -97,11 +97,7 @@ const WIDE_PCT = 82;
 
 const VIEW_BOX = `${-FLOWER_RADIUS} ${-FLOWER_RADIUS} ${2 * FLOWER_RADIUS} ${2 * FLOWER_RADIUS}`;
 
-const BAND_WIDTH = Math.min(...PETAL_BANDS.map((band) => band.width));
-
-const LETTER_SIZE = BAND_WIDTH * 0.85;
-
-const SLOT_SIZE = BAND_WIDTH * 0.8;
+const LETTER_SIZE = BOX_SIZE * 1.06;
 
 const BAND_GAP = 0.8;
 
@@ -355,6 +351,7 @@ const DIALOG_PAPER_SX = {
   bgcolor: 'transparent',
   boxShadow: 'none',
   overflow: 'visible',
+  outline: 'none',
 } as const;
 
 const DIALOG_BACKDROP_SX = { bgcolor: alpha(palette.brownDeep, 0.86) } as const;
@@ -540,7 +537,7 @@ function Petal({
   typing: boolean;
   petalRef?: Ref<SVGGElement>;
 }) {
-  const { d, x, y, turn } = PETALS[index];
+  const { d, x, y, turn, bands } = PETALS[index];
   const pose = `translate(${x} ${y}) rotate(${-turn})`;
   return (
     <g ref={petalRef}>
@@ -549,7 +546,7 @@ function Petal({
       {marks && (
         <g clipPath={`url(#${CLIP_ID}-${index})`}>
           <g transform={pose}>
-            {PETAL_BANDS.map((band, b) => (
+            {bands.map((band, b) => (
               <SvgRect
                 key={b}
                 x={band.x + BAND_GAP / 2}
@@ -571,18 +568,18 @@ function Petal({
         textAnchor="middle"
         dominantBaseline="central"
       >
-        {PETAL_BANDS.map((band, b) => {
+        {bands.map((band, b) => {
           const cx = band.x + band.width / 2;
           const letter = letters[b] ?? '';
           return (
             <g key={b}>
               {!marks && (
                 <rect
-                  x={cx - SLOT_SIZE / 2}
-                  y={band.cy - SLOT_SIZE / 2}
-                  width={SLOT_SIZE}
-                  height={SLOT_SIZE}
-                  rx={SLOT_SIZE * 0.22}
+                  x={cx - BOX_SIZE / 2}
+                  y={band.cy - BOX_SIZE / 2}
+                  width={BOX_SIZE}
+                  height={BOX_SIZE}
+                  rx={BOX_SIZE * 0.22}
                   fill={palette.paper}
                   fillOpacity={0.45}
                   stroke={palette.brown}
@@ -920,6 +917,7 @@ export function WordGuessPage() {
         disablePortal
         aria-labelledby="word-guess-result-title"
         aria-describedby="word-guess-result-message"
+        sx={{ WebkitTapHighlightColor: 'transparent' }}
         slotProps={{ paper: { sx: DIALOG_PAPER_SX }, backdrop: { sx: DIALOG_BACKDROP_SX } }}
       >
         <Typography id="word-guess-result-title" sx={DIALOG_TITLE_SX}>

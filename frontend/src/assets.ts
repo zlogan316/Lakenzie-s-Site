@@ -1,6 +1,7 @@
 export const assets = {
   banner: '/banner.png',
   clouds: '/clouds.svg',
+  comingSoonIcon: '/coming_soon_icon.svg',
   dandelionBloom: '/dandelion_bloom.svg',
   dandelionFrame: '/dandelion_frame.png',
   dandelionFrames: [

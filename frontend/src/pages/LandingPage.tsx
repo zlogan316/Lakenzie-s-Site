@@ -38,10 +38,10 @@ const CARD_COPY = `What does it mean to be weird? Is it a way to describe someon
 It's a word that's unique and full of quirk! And if you've ever been described with it, you might have the same diagnosis... but that's not a bad thing (or at the least, doesn't have to be). You have to harness your weirdness, not for clout or attention but instead for things you're passionate about. Soon you might make a difference, and no matter how small it might seem to others, the true difference is the one you make to yourself.`;
 
 const CARD_COPY_SX = {
-  color: palette.brown,
+  color: palette.brownDeep,
   lineHeight: { xs: 1.4, sm: 1.6 },
   fontWeight: 500,
-  textAlign: 'center',
+  textAlign: 'left',
   whiteSpace: 'pre-line',
   fontSize: {
     xs: fitted('5cqw'),
@@ -74,8 +74,8 @@ const DANDELIONS = [
     mirrored: false,
   },
   {
-    to: '/fun-facts',
-    label: 'Fun Facts',
+    to: '/info',
+    label: 'Info',
     left: { xs: `calc(100% - ${DANDELION_WIDTH} * ${1 + DANDELION_INSET})`, sm: '79%', md: '80.5%' },
     mirrored: true,
   },
