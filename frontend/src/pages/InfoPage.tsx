@@ -36,6 +36,11 @@ const YouTubeIcon = createSvgIcon(
   'YouTube',
 );
 
+const FacebookIcon = createSvgIcon(
+  <path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z" />,
+  'Facebook',
+);
+
 const ArrowDownIcon = createSvgIcon(
   <path
     d="M6 9l6 6 6-6"
@@ -52,6 +57,7 @@ const SOCIALS = [
   { label: 'Instagram', href: 'https://www.instagram.com/_lakenzo_/', Icon: InstagramIcon },
   { label: 'TikTok', href: 'https://www.tiktok.com/@_lakenzo_', Icon: TikTokIcon },
   { label: 'YouTube', href: 'https://www.youtube.com/@LaKenzo', Icon: YouTubeIcon },
+  { label: 'Facebook', href: 'https://www.facebook.com/p/LaKenzo-61550733793272/', Icon: FacebookIcon },
 ] as const;
 
 const ABOUT_ME = {
@@ -551,9 +557,11 @@ const HINT_SX = {
 
 const SOCIAL_LINK_SX = {
   display: 'inline-flex',
+  flex: { xs: 1, sm: 'initial' },
   alignItems: 'center',
+  justifyContent: 'center',
   gap: '0.45em',
-  px: '1.1em',
+  px: { xs: '0.6em', sm: '1.1em' },
   py: '0.7em',
   borderRadius: '999em',
   fontSize: '1em',
@@ -922,8 +930,10 @@ function SocialLinks() {
         listStyle: 'none',
         m: 0,
         p: 0,
+        width: '100%',
         maxWidth: '26em',
-        display: 'flex',
+        display: { xs: 'grid', sm: 'flex' },
+        gridTemplateColumns: 'repeat(2, 1fr)',
         flexWrap: 'wrap',
         justifyContent: 'center',
         gap: '0.7em',
