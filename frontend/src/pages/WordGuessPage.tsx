@@ -225,11 +225,7 @@ const SPIN_SX = {
 
 const SVG_SX = { display: 'block', width: '100%', height: '100%', overflow: 'visible' } as const;
 
-const POP_SX = {
-  transformBox: 'fill-box',
-  transformOrigin: 'center',
-  [MOTION]: { animation: `${POP} 140ms ease-out` },
-};
+const POP_SX = { [MOTION]: { animation: `${POP} 140ms ease-out` } };
 
 const REVEAL_BAND_SX = Array.from({ length: WORD_LENGTH }, (_, b) => ({
   [MOTION]: {
@@ -566,17 +562,15 @@ function Petal({
         fontFamily={fontTitle}
         fontSize={LETTER_SIZE}
         textAnchor="middle"
-        dominantBaseline="central"
       >
         {bands.map((band, b) => {
-          const cx = band.x + band.width / 2;
           const letter = letters[b] ?? '';
           return (
-            <g key={b}>
+            <g key={b} transform={`translate(${band.x + band.width / 2} ${band.cy})`}>
               {!marks && (
                 <rect
-                  x={cx - BOX_SIZE / 2}
-                  y={band.cy - BOX_SIZE / 2}
+                  x={-BOX_SIZE / 2}
+                  y={-BOX_SIZE / 2}
                   width={BOX_SIZE}
                   height={BOX_SIZE}
                   rx={BOX_SIZE * 0.22}
@@ -589,8 +583,7 @@ function Petal({
               )}
               {letter !== '' && (
                 <SvgText
-                  x={cx}
-                  y={band.cy}
+                  dominantBaseline="central"
                   sx={[
                     { fill: marks ? MARK_INK[marks[b]] : palette.brownDeep },
                     typing && POP_SX,
